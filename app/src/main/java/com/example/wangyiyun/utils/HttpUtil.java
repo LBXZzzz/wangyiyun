@@ -6,6 +6,8 @@ import android.util.Log;
 
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -13,8 +15,10 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HttpUtil {
-    public void Post(String Url, RequestBody requestBody){
-        new Thread(new Runnable() {
+    public  static  ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    //网络获取的post方法
+    public static void Post(String Url, RequestBody requestBody){
+        cachedThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -29,7 +33,7 @@ public class HttpUtil {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
 }

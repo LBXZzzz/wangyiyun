@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.presenter.CodePresenter;
+import com.example.wangyiyun.utils.HttpUtil;
 
 public class CodeActivity extends AppCompatActivity {
     private EditText mEditText;

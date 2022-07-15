@@ -6,17 +6,17 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.SeekBar;
 
 import com.example.wangyiyun.R;
+import com.example.wangyiyun.utils.HttpUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +27,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout llUser,llMusic;
     private Toolbar toolbar;
     static MediaPlayer  sMediaPlayer = new MediaPlayer();
-
+    private Button btpPlay, btPause;
+    SeekBar seekBar;
+    boolean isPlay=true;
+    boolean isTime=true;
+    int time=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,23 +42,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(MainActivity.this,MainActivity2.class);//给后面开启的活动传值
+                Intent intent=new Intent(MainActivity.this,SearchActivity.class);//给后面开启的活动传值
                 startActivity(intent);
             }
         });
 
-        //建立，媒体播放对象
-       try {
-           sMediaPlayer.setDataSource("https://music.163.com/song/media/outer/url?id=1963064332.mp3");//设置音源
-           sMediaPlayer.prepare();
-           sMediaPlayer.start();
-       } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        btpPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HttpUtil.cachedThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(!sMediaPlayer.isPlaying()){
+                            if(isPlay){
+                                try {
+                                    String threadName = Thread.currentThread().getName();
+                                    Log.v("zwy", "线程：" + threadName );
+                                    sMediaPlayer.setDataSource("https://music.163.com/song/media/outer/url?id=1963064332.mp3");//设置音源
+                                    sMediaPlayer.prepare();
+                                    sMediaPlayer.start();
+                                    seekBar.setMax(sMediaPlayer.getDuration());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                isPlay=false;
+                            }else {
+                                sMediaPlayer.start();
+                            }
+                            isTime=true;
+                        }
+                    }
+                });
+            }
+        });
+        btPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(sMediaPlayer.isPlaying()){
+                    sMediaPlayer.pause();
+                    isTime=false;
+                }
+            }
+        });
+        HttpUtil.cachedThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (isTime){
+                    try {
+                        time+=1000;
+                        Thread.sleep(1000);
+                        seekBar.setProgress(time);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private void initPaper() {
+        btpPlay =findViewById(R.id.play);
+        btPause =findViewById(R.id.pause);
+        seekBar=findViewById(R.id.seekbar);
         mViewPaper2=findViewById(R.id.view_paper_main);
         ArrayList<Fragment> fragmentList=new ArrayList<>();
         fragmentList.add(MusicFragment.newInstance("1","2"));
@@ -115,4 +164,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         changeTab(view.getId());
     }
+
+    public void musicPlay(){
+
+    }
+
 }
