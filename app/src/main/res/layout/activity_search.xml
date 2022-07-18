@@ -17,6 +17,9 @@
             android:id="@+id/et_search"
             android:layout_width="300dp"
             android:layout_height="30dp"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"
             android:drawableStart="@drawable/ic_search_logo"
             android:background="@drawable/edittext_ellipse_shape"/>
         <Button
@@ -47,7 +50,7 @@
             <LinearLayout
                 android:id="@+id/lly1"
                 android:layout_width="380dp"
-                android:layout_height="500dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginEnd="16dp"

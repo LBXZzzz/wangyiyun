@@ -10,8 +10,10 @@ public class GetPhoneCode implements ContactClass.ILoginCodeModel {
 
     @Override
     public void loginCode(String phoneNumber, String code) {
-        HttpUtil httpUtil=new HttpUtil();
-        RequestBody requestBody = new FormBody.Builder().add("phone",phoneNumber).add("captcha",code).build();
-        httpUtil.Post("https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/captcha/verify",requestBody);
+        HttpUtil.cachedThreadPool.execute(()->{
+            RequestBody requestBody = new FormBody.Builder().add("phone",phoneNumber).add("captcha",code).build();
+            HttpUtil httpUtil=new HttpUtil();
+            httpUtil.post("https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/captcha/verify",requestBody);
+        });
     }
 }

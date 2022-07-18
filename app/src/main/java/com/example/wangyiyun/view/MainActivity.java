@@ -30,8 +30,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btpPlay, btPause;
     SeekBar seekBar;
     boolean isPlay=true;
-    boolean isTime=true;
-    int time=0;
+    boolean isTime=false;
+
+    private final Runnable r = new Runnable() {
+        @Override
+        public void run() {
+            while (isTime && sMediaPlayer.isPlaying()){
+                try {
+                    Thread.sleep(1000);
+                    seekBar.setProgress(sMediaPlayer.getCurrentPosition());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +61,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        sMediaPlayer.setOnPreparedListener((mediaPlayer -> {
+            mediaPlayer.start();
+            seekBar.setMax(sMediaPlayer.getDuration());
+            startProgress();
+        }));
+
         btpPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,9 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     String threadName = Thread.currentThread().getName();
                                     Log.v("zwy", "线程：" + threadName );
                                     sMediaPlayer.setDataSource("https://music.163.com/song/media/outer/url?id=1963064332.mp3");//设置音源
-                                    sMediaPlayer.prepare();
-                                    sMediaPlayer.start();
-                                    seekBar.setMax(sMediaPlayer.getDuration());
+                                    sMediaPlayer.prepareAsync();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -69,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }else {
                                 sMediaPlayer.start();
                             }
-                            isTime=true;
+                            startProgress();
                         }
                     }
                 });
@@ -80,24 +98,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View view) {
                 if(sMediaPlayer.isPlaying()){
                     sMediaPlayer.pause();
-                    isTime=false;
+                    stopProgress();
                 }
             }
         });
-        HttpUtil.cachedThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (isTime){
-                    try {
-                        time+=1000;
-                        Thread.sleep(1000);
-                        seekBar.setProgress(time);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startProgress();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopProgress();
+    }
+
+    private void startProgress(){
+        isTime = true;
+        HttpUtil.cachedThreadPool.execute(r);
+    }
+
+    private void stopProgress(){
+        isTime = false;
     }
 
     private void initPaper() {
