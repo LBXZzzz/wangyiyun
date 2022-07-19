@@ -17,7 +17,7 @@ import okhttp3.Response;
 public class HttpUtil {
     public  static  ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
     //网络获取的post方法
-    public  String post(String Url, RequestBody requestBody){
+    public static String post(String Url, RequestBody requestBody){
             try {
                 //1.创建OkHttpClient对象
                 OkHttpClient  okHttpClient = new OkHttpClient();
@@ -32,7 +32,7 @@ public class HttpUtil {
             return null;
     }
 
-    public  String get(String url){
+    public static String get(String url){
         try {
             OkHttpClient okHttpClient=new OkHttpClient();
             Request request = new Request.Builder().get().url(url).build();

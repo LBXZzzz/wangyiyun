@@ -26,19 +26,19 @@ import okhttp3.RequestBody;
 public class GetSearchContent implements ContactClass.IGetSearchContent {
 
     /**
-     * 搜索的接口：https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/cloudsearch?keywords=%E8%96%9B%E4%B9%8B%E8%B0%A6
+     * 搜索的接口：https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/cloudsearch?keywords=%E6%B5%B7%E9%98%94%E5%A4%A9%E7%A9%BA
      * 必选参数 : keywords : 关键词
      * 可选参数 : limit : 返回数量 , 默认为 30 offset : 偏移数量，用于分页 , 如 : 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0
      * type: 搜索类型；默认为 1 即单曲 , 取值意义 : 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频, 1018:综合, 2000:声音(搜索声音返回字段格式会不一样)
      * */
-    private final String url="https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/cloudsearch";
+    private final String url="https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/cloudsearch?keywords=";
     private List<SongItem> list=new ArrayList<>();
     private Handler handler;
-    private void returnData(RequestBody requestBody){
+    private void returnData(String url){
             HttpUtil.cachedThreadPool.execute(()->{
                 try {
-                    HttpUtil httpUtil=new HttpUtil();
-                    analyzeData(httpUtil.post(url,requestBody));
+
+                    analyzeData(HttpUtil.get(url));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -67,9 +67,9 @@ public class GetSearchContent implements ContactClass.IGetSearchContent {
     @Override
     public void getContent(String searchWord, int offset, ContactClass.IDataList iDataList) {
         String s=String.valueOf(offset);
-        Log.d("zwysr",searchWord);
-        RequestBody requestBody = new FormBody.Builder().add("keywords",searchWord).add("offset",s).build();
-        returnData(requestBody);
+        String searchUrl=url+searchWord+"&offset="+s;
+        Log.d("zwysr",url);
+        returnData(searchUrl);
         handler=new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
