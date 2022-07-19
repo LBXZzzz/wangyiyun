@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             while (isTime && sMediaPlayer.isPlaying()){
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                     seekBar.setProgress(sMediaPlayer.getCurrentPosition());
                 } catch (InterruptedException e) {
                     e.printStackTrace();

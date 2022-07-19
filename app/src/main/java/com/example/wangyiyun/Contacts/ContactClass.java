@@ -1,5 +1,7 @@
 package com.example.wangyiyun.Contacts;
 
+import android.view.View;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,4 +53,8 @@ public final class ContactClass {
         void getReturn();
         void analyzeData();
     }*/
+    //recyclerview的点击事件的接口
+    public interface OnItemClickListener{
+        void onItemClick(View view, int position);
+    }
 }
