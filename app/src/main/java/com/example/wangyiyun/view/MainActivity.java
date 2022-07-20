@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
+import com.example.musicmelody.IMusic;
+import com.example.musicmelody.MusicPlay;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.utils.HttpUtil;
 
@@ -23,22 +26,24 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private ViewPager2 mViewPaper2;
-    private ImageView mivUser,mivMusic,ivCurrent;
+    private ImageView mivUser,mivMusic,ivCurrent,mivMusicPlay;
     private LinearLayout llUser,llMusic;
     private Toolbar toolbar;
-    static MediaPlayer  sMediaPlayer = new MediaPlayer();
-    private Button btpPlay, btPause;
+    static MediaPlayer sMediaPlayer = new MediaPlayer();
     SeekBar seekBar;
     boolean isPlay=true;
     boolean isTime=false;
+    boolean play=false;
+    IMusic iMusic=new MusicPlay();
 
     private final Runnable r = new Runnable() {
         @Override
         public void run() {
-            while (isTime && sMediaPlayer.isPlaying()){
+            while (isTime){
                 try {
-                    Thread.sleep(100);
-                    seekBar.setProgress(sMediaPlayer.getCurrentPosition());
+                    seekBar.setMax(iMusic.getMusicTotalTime());
+                    Thread.sleep(70);
+                    seekBar.setProgress(iMusic.getMusicCurrentTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -50,9 +55,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //设置状态栏的背景颜色和字体颜色
+        getWindow().setStatusBarColor(Color.rgb(255,255,255));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
         initPaper();
         initTabView();
+        mivMusicPlay=findViewById(R.id.iv_music_play);
         toolbar=findViewById(R.id.main_too_bar);
+        mivMusicPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!play){
+                    //写音乐播放事件
+                    mivMusicPlay.setSelected(true);
+                    play=true;
+                    HttpUtil.cachedThreadPool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            iMusic.startMusic();
+
+                            startProgress();
+                        }
+                    });
+                }else {
+                    //音乐暂停
+                    mivMusicPlay.setSelected(false);
+                    play=false;
+                    iMusic.stopMusic();
+                    stopProgress();
+                }
+
+            }
+        });
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -66,42 +101,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             seekBar.setMax(sMediaPlayer.getDuration());
             startProgress();
         }));
-
-        btpPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                HttpUtil.cachedThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(!sMediaPlayer.isPlaying()){
-                            if(isPlay){
-                                try {
-                                    String threadName = Thread.currentThread().getName();
-                                    Log.v("zwy", "线程：" + threadName );
-                                    sMediaPlayer.setDataSource("https://music.163.com/song/media/outer/url?id=1963064332.mp3");//设置音源
-                                    sMediaPlayer.prepareAsync();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                isPlay=false;
-                            }else {
-                                sMediaPlayer.start();
-                            }
-                            startProgress();
-                        }
-                    }
-                });
-            }
-        });
-        btPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(sMediaPlayer.isPlaying()){
-                    sMediaPlayer.pause();
-                    stopProgress();
-                }
-            }
-        });
     }
 
     @Override
@@ -126,8 +125,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initPaper() {
-        btpPlay =findViewById(R.id.play);
-        btPause =findViewById(R.id.pause);
         seekBar=findViewById(R.id.seekbar);
         mViewPaper2=findViewById(R.id.view_paper_main);
         ArrayList<Fragment> fragmentList=new ArrayList<>();
@@ -135,8 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fragmentList.add(UserFragment.newInstance("1","2"));
         MainFragmentAdapter mainFragmentAdapter=new MainFragmentAdapter(getSupportFragmentManager(),getLifecycle(),fragmentList);
         mViewPaper2.setAdapter(mainFragmentAdapter);
-        //禁止ViewPaper2的滑动
-        //viewPager.setUserInputEnabled(false);
         mViewPaper2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {//滚动的动画
@@ -189,9 +184,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         changeTab(view.getId());
     }
-
-    public void musicPlay(){
-
-    }
-
 }

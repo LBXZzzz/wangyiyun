@@ -117,13 +117,13 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             bt.setPadding(50,0,0,0);
             bt.setBackgroundColor(getResources().getColor(R.color.gray_s));
             mLinearLayout.addView(bt);
-            searchWord=hotSearchItems.get(i).getSearchWord();
             bt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mLinearLayout.setVisibility(View.GONE);
                     mProgressBar.setVisibility(View.VISIBLE);
                     page=0;
+                    searchWord=bt.getText().toString();
                     searchPresenter.searchWord(searchWord,0);
                 }
             });
