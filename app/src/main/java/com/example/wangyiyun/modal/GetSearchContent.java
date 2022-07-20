@@ -73,6 +73,7 @@ public class GetSearchContent implements ContactClass.IGetSearchContent {
         handler=new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
+                list=new ArrayList<>();
                 list=(ArrayList<SongItem>)msg.obj;
                 iDataList.dataReturn(list);
                 super.handleMessage(msg);

@@ -1,8 +1,10 @@
 package com.example.wangyiyun.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -12,15 +14,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.wangyiyun.Contacts.ContactClass;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.entries.SongItem;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<SongItem> songItemArrayList;
+    private Context mContext;
 
-    public SearchRecyclerViewAdapter(List<SongItem> songItemArrayList){
+    public SearchRecyclerViewAdapter(Context context,List<SongItem> songItemArrayList){
         this.songItemArrayList=songItemArrayList;
+        this.mContext=context;
     }
     private ContactClass.OnItemClickListener mOnItemClickListener;
 
@@ -31,10 +36,12 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView textView;
         TextView textView1;
+        ImageView imageView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textView=itemView.findViewById(R.id.tv_song_name);
             textView1=itemView.findViewById(R.id.tv_singer_name);
+            imageView=itemView.findViewById(R.id.iv_music_photo);
         }
     }
 
@@ -58,6 +65,10 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             SongItem songItem=songItemArrayList.get(position);
             (((ViewHolder)holder).textView).setText(songItem.getSongName());
             (((ViewHolder)holder).textView1).setText(songItem.getSingerName());
+            Picasso.with(mContext)
+                    .load(songItem.getPicUrl())
+                    .resize(150,150)
+                    .into(((ViewHolder) holder).imageView);
         }
         if(mOnItemClickListener!=null){
             holder.itemView.setOnClickListener(v -> {

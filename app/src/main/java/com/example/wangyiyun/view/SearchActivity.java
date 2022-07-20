@@ -48,7 +48,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     List<HotSearchItem> hotSearchItems;
     //搜索后传过来的数据
     List<SongItem> songItems;
-    List<SongItem> totalSongItems;
+    List<SongItem> totalSongItems=new ArrayList<>();
     SearchPresenter searchPresenter;
     //标记低第几页
     int page=0;
@@ -136,12 +136,13 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     @Override
     public void getData2(List<?> dataList) {
         songItems=(ArrayList<SongItem>)dataList;
-//        totalSongItems.addAll(songItems);
+        Log.d("zwyss",songItems.get(0).getSongName());
+        totalSongItems.addAll(songItems);
         mProgressBar.setVisibility(View.GONE);
         mLinearLayout1.setVisibility(View.GONE);
         if(page==0){
             mLinearLayout.setVisibility(View.GONE);
-            searchRecyclerViewAdapter=new SearchRecyclerViewAdapter(songItems);
+            searchRecyclerViewAdapter=new SearchRecyclerViewAdapter(getApplicationContext(),songItems);
             mRecyclerView.setAdapter(searchRecyclerViewAdapter);
         }else {
             searchRecyclerViewAdapter.updateData(songItems);
