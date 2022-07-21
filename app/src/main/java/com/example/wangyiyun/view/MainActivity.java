@@ -11,7 +11,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -21,29 +21,30 @@ import com.example.musicmelody.MusicPlay;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.utils.HttpUtil;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private ViewPager2 mViewPaper2;
     private ImageView mivUser,mivMusic,ivCurrent,mivMusicPlay;
     private LinearLayout llUser,llMusic;
     private Toolbar toolbar;
-    static MediaPlayer sMediaPlayer = new MediaPlayer();
+    private ImageButton ibNextSong,ibPreSong;
     SeekBar seekBar;
-    boolean isPlay=true;
     boolean isTime=false;
+    //判断歌曲是否有在播放
     boolean play=false;
-    IMusic iMusic=new MusicPlay();
+    List<String> songList=new ArrayList<>();
+    IMusic iMusic;
 
     private final Runnable r = new Runnable() {
         @Override
         public void run() {
             while (isTime){
                 try {
-                    seekBar.setMax(iMusic.getMusicTotalTime());
+                    //seekBar.setMax(iMusic.getMusicTotalTime());
                     Thread.sleep(70);
-                    seekBar.setProgress(iMusic.getMusicCurrentTime());
+                    //seekBar.setProgress(iMusic.getMusicCurrentTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -55,6 +56,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        songList.add("https://music.163.com/song/media/outer/url?id=32192436.mp3");
+        songList.add("https://music.163.com/song/media/outer/url?id=415792881.mp3");
+        songList.add("https://music.163.com/song/media/outer/url?id=516657051.mp3");
+        songList.add("https://music.163.com/song/media/outer/url?id=468517654.mp3");
+        songList.add("https://music.163.com/song/media/outer/url?id=1498342485.mp3");
+        iMusic=new MusicPlay(songList);
         //设置状态栏的背景颜色和字体颜色
         getWindow().setStatusBarColor(Color.rgb(255,255,255));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
@@ -62,6 +69,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initTabView();
         mivMusicPlay=findViewById(R.id.iv_music_play);
         toolbar=findViewById(R.id.main_too_bar);
+        ibNextSong =findViewById(R.id.ib_next_song);
+        ibPreSong=findViewById(R.id.ib_pre_song);
+        ibNextSong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopProgress();
+                iMusic.nextSong();
+                mivMusicPlay.setSelected(true);
+                play=true;
+                startProgress();
+            }
+        });
+        ibPreSong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopProgress();
+                iMusic.preSong();
+                mivMusicPlay.setSelected(true);
+                play=true;
+                startProgress();
+            }
+        });
         mivMusicPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            iMusic.startMusic();
+                            iMusic.startMusic("https://music.163.com/song/media/outer/url?id=1964644539.mp3");
                             startProgress();
                         }
                     });
@@ -94,24 +123,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
-
-        sMediaPlayer.setOnPreparedListener((mediaPlayer -> {
-            mediaPlayer.start();
-            seekBar.setMax(sMediaPlayer.getDuration());
-            startProgress();
-        }));
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopProgress();
-    }
 
     private void startProgress(){
         isTime = true;

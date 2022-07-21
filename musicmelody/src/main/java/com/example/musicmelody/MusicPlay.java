@@ -2,21 +2,29 @@ package com.example.musicmelody;
 
 import android.media.MediaPlayer;
 import android.util.Log;
+import android.view.View;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MusicPlay implements IMusic{
-    private MediaPlayer mediaPlayer=new MediaPlayer();
+    private MediaPlayer mediaPlayer;
+    //判断有没有MediaPlayer准备过,true为没准备过
     private boolean isPlay=true;
-    private boolean isTime=false;
+    //记录歌曲播放到第几首
+    int songNumber=0;
+    List<String> songList=new ArrayList<>();
+    public  MusicPlay(List<String> songList){
+        this.songList=songList;
+    }
+
     @Override
-    public void startMusic() {
-        if(!mediaPlayer.isPlaying()){
+    public void startMusic(String musicUrl) {
             if(isPlay){
                 try {
-                    String threadName = Thread.currentThread().getName();
-                    Log.v("zwy", "线程：" + threadName );
-                    mediaPlayer.setDataSource("https://music.163.com/song/media/outer/url?id=1964644539.mp3");//设置音源
+                    mediaPlayer=new MediaPlayer();
+                    mediaPlayer.setDataSource(songList.get(songNumber));//设置音源
                     mediaPlayer.prepareAsync();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -25,10 +33,15 @@ public class MusicPlay implements IMusic{
             }else {
                 mediaPlayer.start();
             }
-        }
-        mediaPlayer.setOnPreparedListener((mediaPlayer -> {
-            mediaPlayer.start();
-        }));
+            mediaPlayer.setOnPreparedListener((mediaPlayer -> {
+                mediaPlayer.start();
+            }));
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    Log.d("zwyoo","pppppppksdkasdl");
+                }
+            });
     }
 
 
@@ -41,13 +54,33 @@ public class MusicPlay implements IMusic{
 
     @Override
     public void nextSong() {
-            isPlay=true;
-            startMusic();
+        if (!isPlay) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            isPlay = true;
+        }
+        if (songNumber==songList.size()-1){
+            songNumber=0;
+        }else {
+            songNumber+=1;
+        }
+        startMusic(songList.get(songNumber));
     }
 
     @Override
     public void preSong() {
+        if (!isPlay) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            isPlay = true;
+        }
+        if (songNumber==0){
+            songNumber=songList.size()-1;
+        }else {
+            songNumber-=1;
+        }
 
+        startMusic(songList.get(songNumber));
     }
 
     @Override
@@ -64,4 +97,6 @@ public class MusicPlay implements IMusic{
     public int getMusicCurrentTime() {
         return mediaPlayer.getCurrentPosition();
     }
+
+
 }

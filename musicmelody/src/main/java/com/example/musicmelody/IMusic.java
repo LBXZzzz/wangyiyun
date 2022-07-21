@@ -1,8 +1,10 @@
 package com.example.musicmelody;
 
+import java.util.List;
+
 public interface IMusic {
     //开始播放音乐
-    void startMusic();
+    void startMusic(String musicUrl);
     //暂停音乐
     void stopMusic();
     //下一首播放

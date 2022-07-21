@@ -39,6 +39,7 @@
         android:gravity="center"
         android:layout_height="wrap_content">
         <ImageButton
+            android:id="@+id/ib_pre_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_previous__song" />
@@ -60,6 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <ImageButton
+            android:id="@+id/ib_next_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_next_song"/>
