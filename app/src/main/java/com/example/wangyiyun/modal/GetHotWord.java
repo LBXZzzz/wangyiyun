@@ -7,7 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.wangyiyun.Contacts.ContactClass;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.entries.HotSearchItem;
 import com.example.wangyiyun.utils.HttpUtil;
 import com.example.wangyiyun.utils.ListChangeUtil;

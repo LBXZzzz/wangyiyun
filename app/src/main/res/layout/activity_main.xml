@@ -22,7 +22,7 @@
        android:layout_width="match_parent"
        android:layout_weight="1"
        android:layout_height="0dp"/>
-   <include layout="@layout/hh"/>
+   <include layout="@layout/music_player"/>
    <include layout="@layout/navigation_bar"/>
 
 </LinearLayout>

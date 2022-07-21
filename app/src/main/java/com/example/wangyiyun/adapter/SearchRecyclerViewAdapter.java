@@ -11,12 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.wangyiyun.Contacts.ContactClass;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.entries.SongItem;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -68,6 +67,7 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             Picasso.with(mContext)
                     .load(songItem.getPicUrl())
                     .resize(150,150)
+                    .placeholder(R.drawable.ic_android_black_24dp)
                     .into(((ViewHolder) holder).imageView);
         }
         if(mOnItemClickListener!=null){

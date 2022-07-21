@@ -1,8 +1,7 @@
-package com.example.wangyiyun.Contacts;
+package com.example.wangyiyun.contacts;
 
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class ContactClass {

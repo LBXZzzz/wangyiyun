@@ -1,6 +1,6 @@
 package com.example.wangyiyun.presenter;
 
-import com.example.wangyiyun.Contacts.ContactClass;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.modal.GetPhoneNumber;
 
 public class LoginActivityPresenter implements ContactClass.ILoginPresenter {

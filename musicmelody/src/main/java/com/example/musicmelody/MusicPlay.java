@@ -41,7 +41,8 @@ public class MusicPlay implements IMusic{
 
     @Override
     public void nextSong() {
-
+            isPlay=true;
+            startMusic();
     }
 
     @Override

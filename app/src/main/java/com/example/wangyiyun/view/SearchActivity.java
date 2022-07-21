@@ -7,11 +7,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 
-import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,14 +22,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
-import com.example.wangyiyun.Contacts.ContactClass;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.ViewByMyself.WaterFlowLayout;
 import com.example.wangyiyun.adapter.SearchRecyclerViewAdapter;
 import com.example.wangyiyun.entries.HotSearchItem;
 import com.example.wangyiyun.entries.SongItem;
 import com.example.wangyiyun.presenter.SearchPresenter;
-import com.example.wangyiyun.utils.ListChangeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,11 +58,12 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        getWindow().setStatusBarColor(Color.rgb(255,255,255));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
         searchPresenter=new SearchPresenter(this,this);
         initControl();
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         mLinearLayout.setVisibility(View.GONE);
         searchPresenter.bridge();
         controlFunction();
@@ -108,8 +107,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         hotSearchItems=(ArrayList<HotSearchItem>)dataList;
         for (int i = 0; i < hotSearchItems.size(); i++) {
             Button bt =new Button(this);
-            String s = String.valueOf(i+1);
-            bt.setText(s+"."+hotSearchItems.get(i).getSearchWord());
+            bt.setText(hotSearchItems.get(i).getSearchWord());
             if(i<3){
                 bt.setTextColor(getResources().getColor(R.color.big_red));
             }
@@ -123,6 +121,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                     mLinearLayout.setVisibility(View.GONE);
                     mProgressBar.setVisibility(View.VISIBLE);
                     page=0;
+                    Log.d("zwytu",bt.getText().toString());
                     searchWord=bt.getText().toString();
                     searchPresenter.searchWord(searchWord,0);
                 }
@@ -136,7 +135,6 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     @Override
     public void getData2(List<?> dataList) {
         songItems=(ArrayList<SongItem>)dataList;
-        Log.d("zwyss",songItems.get(0).getSongName());
         totalSongItems.addAll(songItems);
         mProgressBar.setVisibility(View.GONE);
         mLinearLayout1.setVisibility(View.GONE);

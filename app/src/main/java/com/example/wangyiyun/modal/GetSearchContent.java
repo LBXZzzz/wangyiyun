@@ -7,11 +7,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.wangyiyun.Contacts.ContactClass;
-import com.example.wangyiyun.entries.HotSearchItem;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.entries.SongItem;
 import com.example.wangyiyun.utils.HttpUtil;
-import com.example.wangyiyun.utils.ListChangeUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,9 +17,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
 
 public class GetSearchContent implements ContactClass.IGetSearchContent {
 
@@ -37,9 +32,8 @@ public class GetSearchContent implements ContactClass.IGetSearchContent {
     private void returnData(String url){
             HttpUtil.cachedThreadPool.execute(()->{
                 try {
-
                     analyzeData(HttpUtil.get(url));
-                } catch (JSONException e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             });
@@ -56,8 +50,7 @@ public class GetSearchContent implements ContactClass.IGetSearchContent {
             JSONObject jsonObject3=jsonArray1.getJSONObject(0);
             JSONObject jsonObject4=jsonObject2.getJSONObject("al");
             SongItem songItem=new SongItem(jsonObject3.getString("name"),jsonObject2.getString("name"),
-                                            jsonObject2.getString("id"),jsonObject4.getString("picUrl"));
-
+                                            jsonObject2.getString("id"),jsonObject4.getString("picUrl")+"?param=150y150");
             list.add(songItem);
             Message message=new Message();
             message.obj=list;

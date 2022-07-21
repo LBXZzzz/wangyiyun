@@ -1,6 +1,6 @@
 package com.example.wangyiyun.modal;
 
-import com.example.wangyiyun.Contacts.ContactClass;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.utils.HttpUtil;
 
 import okhttp3.FormBody;

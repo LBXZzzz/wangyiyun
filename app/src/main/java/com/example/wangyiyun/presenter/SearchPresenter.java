@@ -1,13 +1,9 @@
 package com.example.wangyiyun.presenter;
 
-import android.util.Log;
-
-import com.example.wangyiyun.Contacts.ContactClass;
+import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.modal.GetHotWord;
 import com.example.wangyiyun.modal.GetSearchContent;
-import com.example.wangyiyun.utils.HttpUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SearchPresenter implements ContactClass.IPresenter ,ContactClass.ISearchPresenter{

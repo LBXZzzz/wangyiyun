@@ -4,30 +4,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.SearchActivity"
+    android:background="@color/Grey"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_too_bar"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="@color/gray"
+        android:background="@color/white"
         android:orientation="horizontal"
         android:textSize="20sp">
-        <EditText
-            android:id="@+id/et_search"
-            android:layout_width="300dp"
-            android:layout_height="30dp"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:imeOptions="actionSearch"
-            android:drawableStart="@drawable/ic_search_logo"
-            android:background="@drawable/edittext_ellipse_shape"/>
-        <Button
-            android:id="@+id/bt_search"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:text="取消"
-            android:textColor="@color/black"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="255dp"
+                android:layout_height="30dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:imeOptions="actionSearch"
+                android:drawableStart="@drawable/ic_search_logo"
+                android:background="@drawable/edittext_ellipse_shape"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <Button
+                android:id="@+id/bt_search"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:text="取消"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
     </androidx.appcompat.widget.Toolbar>
     <ScrollView
         android:layout_width="match_parent"
@@ -41,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:text="历史搜索"/>
             <com.example.wangyiyun.ViewByMyself.WaterFlowLayout
                 android:id="@+id/fl_search"
@@ -50,7 +63,7 @@
             </com.example.wangyiyun.ViewByMyself.WaterFlowLayout>
             <LinearLayout
                 android:id="@+id/lly1"
-                android:layout_width="380dp"
+                android:layout_width="330dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
@@ -67,7 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:text="热搜榜"/>
             </LinearLayout>
         </LinearLayout>
@@ -76,8 +89,26 @@
         android:id="@+id/pb_serrch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/search_activity_recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="330dp"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/linearlayout_ellipse"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginStart="20dp"
+            android:text="单曲"
+            android:textSize="16sp"
+            android:textColor="@color/big_red"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:paddingVertical="10dp"
+            android:id="@+id/search_activity_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
 </LinearLayout>
