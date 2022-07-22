@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.wangyiyun.contacts.ContactClass;
@@ -45,8 +46,8 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     //储存传递过来的热搜词集合
     List<HotSearchItem> hotSearchItems;
     //搜索后传过来的数据
-    List<SongItem> songItems;
-    List<SongItem> totalSongItems=new ArrayList<>();
+    ArrayList<SongItem> songItems=new ArrayList<>();
+    ArrayList<SongItem> totalSongItems=new ArrayList<>();
     SearchPresenter searchPresenter;
     //标记低第几页
     int page=0;
@@ -67,6 +68,26 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         mLinearLayout.setVisibility(View.GONE);
         searchPresenter.bridge();
         controlFunction();
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                LinearLayoutManager manager=(LinearLayoutManager) recyclerView.getLayoutManager();
+                // 当不滑动时
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    //获取最后一个完全显示的itemPosition
+                    int lastItemPosition = manager.findLastCompletelyVisibleItemPosition();
+                    int itemCount = manager.getItemCount();
+                    // 判断是否滑动到了最后一个item，并且是向上滑动
+                    if (lastItemPosition == (itemCount - 1) ) {
+                        //加载更多
+                        page+=1;
+                        Log.d("zwyupi",String.valueOf(page));
+                        searchPresenter.searchWord(searchWord,page);
+                    }
+                }
+            }
+        });
     }
 
     //初始化控件
@@ -92,6 +113,9 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 searchPresenter.searchWord(searchWord,0);
                 mProgressBar.setVisibility(View.VISIBLE);
                 mLinearLayout.setVisibility(View.GONE);
+                songItems=new ArrayList<>();
+                totalSongItems=new ArrayList<>();
+                page=0;
                 //点击回车后自动收起键盘
                 InputMethodManager manager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (manager != null)
@@ -121,7 +145,8 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                     mLinearLayout.setVisibility(View.GONE);
                     mProgressBar.setVisibility(View.VISIBLE);
                     page=0;
-                    Log.d("zwytu",bt.getText().toString());
+                    songItems=new ArrayList<>();
+                    totalSongItems=new ArrayList<>();
                     searchWord=bt.getText().toString();
                     searchPresenter.searchWord(searchWord,0);
                 }
@@ -134,7 +159,10 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     @SuppressWarnings("unchecked")
     @Override
     public void getData2(List<?> dataList) {
+        songItems=new ArrayList<>();
         songItems=(ArrayList<SongItem>)dataList;
+        totalSongItems.addAll(songItems);
+        Log.d("zwyttti",String.valueOf(songItems.size()));
         totalSongItems.addAll(songItems);
         mProgressBar.setVisibility(View.GONE);
         mLinearLayout1.setVisibility(View.GONE);
@@ -143,25 +171,16 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             searchRecyclerViewAdapter=new SearchRecyclerViewAdapter(getApplicationContext(),songItems);
             mRecyclerView.setAdapter(searchRecyclerViewAdapter);
         }else {
+            Log.d("zwyss:",String.valueOf(songItems.size()));
+            Log.d("zwysssss",songItems.get(0).getSongName());
             searchRecyclerViewAdapter.updateData(songItems);
         }
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        searchRecyclerViewAdapter.setOnItemClickListener(new ContactClass.OnItemClickListener() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                LinearLayoutManager manager=(LinearLayoutManager) recyclerView.getLayoutManager();
-                // 当不滑动时
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    //获取最后一个完全显示的itemPosition
-                    int lastItemPosition = manager.findLastCompletelyVisibleItemPosition();
-                    int itemCount = manager.getItemCount();
-                    // 判断是否滑动到了最后一个item，并且是向上滑动
-                    if (lastItemPosition == (itemCount - 1) ) {
-                        //加载更多
-                        page+=1;
-                        searchPresenter.searchWord(searchWord,page);
-                    }
-                }
+            public void onItemClick(View view, int position) {
+                String songId=totalSongItems.get(position).getSongId();
+                Log.d("zwyll",songId);
+                String songPlayId="https://music.163.com/song/media/outer/url?id="+songId+".mp3";
             }
         });
     }

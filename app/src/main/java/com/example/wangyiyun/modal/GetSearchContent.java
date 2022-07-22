@@ -52,10 +52,10 @@ public class GetSearchContent implements ContactClass.IGetSearchContent {
             SongItem songItem=new SongItem(jsonObject3.getString("name"),jsonObject2.getString("name"),
                                             jsonObject2.getString("id"),jsonObject4.getString("picUrl")+"?param=150y150");
             list.add(songItem);
-            Message message=new Message();
-            message.obj=list;
-            handler.sendMessage(message);
         }
+        Message message=new Message();
+        message.obj=list;
+        handler.sendMessage(message);
     }
     @Override
     public void getContent(String searchWord, int offset, ContactClass.IDataList iDataList) {
