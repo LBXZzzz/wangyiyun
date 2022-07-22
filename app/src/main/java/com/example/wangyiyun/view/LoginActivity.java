@@ -37,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
                 }else {
                     Toast.makeText(LoginActivity.this,"请输入长度为11的手机号码",Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
     }
@@ -47,6 +46,4 @@ public class LoginActivity extends AppCompatActivity {
         mButton=findViewById(R.id.bt_login);
         loginActivityPresenter=new LoginActivityPresenter();
     }
-
-
 }

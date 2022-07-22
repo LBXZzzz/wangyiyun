@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean isTime=false;
     //判断歌曲是否有在播放
     boolean play=false;
-    List<String> songList=new ArrayList<>();
-    IMusic iMusic;
+    static List<String> songList=new ArrayList<>();
+    static IMusic iMusic;
 
     private final Runnable r = new Runnable() {
         @Override

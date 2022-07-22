@@ -24,7 +24,7 @@ public class MusicPlay implements IMusic{
             if(isPlay){
                 try {
                     mediaPlayer=new MediaPlayer();
-                    mediaPlayer.setDataSource(songList.get(songNumber));//设置音源
+                    mediaPlayer.setDataSource(musicUrl);//设置音源
                     mediaPlayer.prepareAsync();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -36,12 +36,6 @@ public class MusicPlay implements IMusic{
             mediaPlayer.setOnPreparedListener((mediaPlayer -> {
                 mediaPlayer.start();
             }));
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    Log.d("zwyoo","pppppppksdkasdl");
-                }
-            });
     }
 
 
@@ -96,6 +90,16 @@ public class MusicPlay implements IMusic{
     @Override
     public int getMusicCurrentTime() {
         return mediaPlayer.getCurrentPosition();
+    }
+
+    @Override
+    public void openMusic(String musicUrl) {
+        if (!isPlay) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            isPlay = true;
+        }
+        startMusic(musicUrl);
     }
 
 

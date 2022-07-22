@@ -162,8 +162,6 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         songItems=new ArrayList<>();
         songItems=(ArrayList<SongItem>)dataList;
         totalSongItems.addAll(songItems);
-        Log.d("zwyttti",String.valueOf(songItems.size()));
-        totalSongItems.addAll(songItems);
         mProgressBar.setVisibility(View.GONE);
         mLinearLayout1.setVisibility(View.GONE);
         if(page==0){
@@ -171,16 +169,18 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             searchRecyclerViewAdapter=new SearchRecyclerViewAdapter(getApplicationContext(),songItems);
             mRecyclerView.setAdapter(searchRecyclerViewAdapter);
         }else {
-            Log.d("zwyss:",String.valueOf(songItems.size()));
-            Log.d("zwysssss",songItems.get(0).getSongName());
             searchRecyclerViewAdapter.updateData(songItems);
         }
         searchRecyclerViewAdapter.setOnItemClickListener(new ContactClass.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 String songId=totalSongItems.get(position).getSongId();
+                Log.d("zwyll",totalSongItems.get(position).getSongName());
                 Log.d("zwyll",songId);
                 String songPlayId="https://music.163.com/song/media/outer/url?id="+songId+".mp3";
+                MainActivity.songList.add(songPlayId);
+                Log.d("zwyee",MainActivity.songList.get(MainActivity.songList.size()-1));
+                MainActivity.iMusic.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
             }
         });
     }

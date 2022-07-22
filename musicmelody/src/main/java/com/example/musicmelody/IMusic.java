@@ -17,4 +17,6 @@ public interface IMusic {
     int getMusicTotalTime ();
     //获取音乐当前时间
     int getMusicCurrentTime();
+    //
+    void openMusic(String musicUrl);
 }
