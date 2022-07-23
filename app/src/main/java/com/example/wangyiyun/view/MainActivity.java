@@ -47,9 +47,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             while (isTime){
                 try {
-                    //seekBar.setMax(iMusic.getMusicTotalTime());
+                    seekBar.setMax(musicPlay.getMusicTotalTime());
                     Thread.sleep(70);
-                    //seekBar.setProgress(iMusic.getMusicCurrentTime());
+                    seekBar.setProgress(musicPlay.getMusicCurrentTime());
+                    Log.d("zwyee",String.valueOf(musicPlay.getMusicCurrentTime()));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else {
             startService(new Intent(getApplicationContext(), MusicService.class));
         }
-    Intent bindIntent=new Intent(this,MusicService.class);
+        Intent bindIntent=new Intent(this,MusicService.class);
         bindService(bindIntent,connection,BIND_AUTO_CREATE);
         //设置状态栏的背景颜色和字体颜色
         getWindow().setStatusBarColor(Color.rgb(255,255,255));
@@ -138,19 +139,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
-    private ServiceConnection connection=new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            musicPlay=(MusicService.MusicPlay)service;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    };
-
 
     private void startProgress(){
         isTime = true;
@@ -221,4 +209,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         changeTab(view.getId());
     }
+
+    private ServiceConnection connection=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            musicPlay=(MusicService.MusicPlay)service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 }

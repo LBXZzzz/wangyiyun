@@ -147,7 +147,13 @@ public class MusicService extends Service {
 
         @Override
         public int getMusicCurrentTime() {
-            return mediaPlayer.getCurrentPosition();
+            int i=0;
+            try {
+                i=mediaPlayer.getCurrentPosition();
+            }catch (Exception ignore){
+
+            }
+           return i;
         }
 
         @Override
