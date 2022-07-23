@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.wangyiyun.contacts.ContactClass;
@@ -178,7 +179,6 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 Log.d("zwyll",songId);
                 String songPlayId="https://music.163.com/song/media/outer/url?id="+songId+".mp3";
                 searchPresenter.getSongUrl(songId,songPlayId);
-
             }
         });
     }
@@ -190,11 +190,11 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             songPlayId=dataString2;
         }else {
             songPlayId=dataString;
+            Toast.makeText(SearchActivity.this, "VIP歌曲，试听30秒", Toast.LENGTH_SHORT).show();
         }
-        Log.d("zwylp",dataString);
-        Log.d("zwylp",dataString2);
         MainActivity.songList.add(songPlayId);
-        Log.d("zwyee",MainActivity.songList.get(MainActivity.songList.size()-1));
-        MainActivity.iMusic.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
+        MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
+        MainActivity.mivMusicPlay.setSelected(true);
+        MainActivity.play=true;
     }
 }

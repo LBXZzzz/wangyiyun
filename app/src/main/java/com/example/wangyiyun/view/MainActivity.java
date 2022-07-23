@@ -5,10 +5,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
-import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,7 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import com.example.musicmelody.IMusic;
-import com.example.musicmelody.MusicPlay;
+import com.example.musicmelody.MusicPlayOk;
+import com.example.musicmelody.MusicService;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.utils.HttpUtil;
 
@@ -26,16 +30,17 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private ViewPager2 mViewPaper2;
-    private ImageView mivUser,mivMusic,ivCurrent,mivMusicPlay;
+    private ImageView mivUser,ivCurrent,mivMusic;
+    public static ImageView mivMusicPlay;
     private LinearLayout llUser,llMusic;
     private Toolbar toolbar;
     private ImageButton ibNextSong,ibPreSong;
     SeekBar seekBar;
     boolean isTime=false;
     //判断歌曲是否有在播放
-    boolean play=false;
+    static boolean play=false;
     static List<String> songList=new ArrayList<>();
-    static IMusic iMusic;
+    static MusicService.MusicPlay musicPlay;
 
     private final Runnable r = new Runnable() {
         @Override
@@ -61,7 +66,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songList.add("https://music.163.com/song/media/outer/url?id=516657051.mp3");
         songList.add("https://music.163.com/song/media/outer/url?id=468517654.mp3");
         songList.add("https://music.163.com/song/media/outer/url?id=1498342485.mp3");
-        iMusic=new MusicPlay(songList);
+        MusicService.songList=songList;
+        //绑定服务
+        //判断当前版本是否支持前台服务，不支持则开启后台服务
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(getApplicationContext(), MusicService.class));
+        }else {
+            startService(new Intent(getApplicationContext(), MusicService.class));
+        }
+    Intent bindIntent=new Intent(this,MusicService.class);
+        bindService(bindIntent,connection,BIND_AUTO_CREATE);
         //设置状态栏的背景颜色和字体颜色
         getWindow().setStatusBarColor(Color.rgb(255,255,255));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
@@ -75,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 stopProgress();
-                iMusic.nextSong();
+                musicPlay.nextSong();
                 mivMusicPlay.setSelected(true);
                 play=true;
                 startProgress();
@@ -85,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 stopProgress();
-                iMusic.preSong();
+                musicPlay.preSong();
                 mivMusicPlay.setSelected(true);
                 play=true;
                 startProgress();
@@ -101,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            iMusic.startMusic("https://music.163.com/song/media/outer/url?id=1964644539.mp3");
+                            musicPlay.startMusic("https://music.163.com/song/media/outer/url?id=1964644539.mp3");
                             startProgress();
                         }
                     });
@@ -109,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //音乐暂停
                     mivMusicPlay.setSelected(false);
                     play=false;
-                    iMusic.stopMusic();
+                    musicPlay.stopMusic();
                     stopProgress();
                 }
 
@@ -125,6 +139,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    private ServiceConnection connection=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            musicPlay=(MusicService.MusicPlay)service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
 
     private void startProgress(){
