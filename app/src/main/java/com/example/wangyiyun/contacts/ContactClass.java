@@ -20,6 +20,9 @@ public final class ContactClass {
     public interface IView2{
         void getData2(List<?> dataList);
     }
+    public interface IView3{
+        void getData(String dataString,String dataString2);
+    }
     //      presenter层接口
     public interface ILoginPresenter{
         void login(String phoneNumber);
@@ -29,6 +32,9 @@ public final class ContactClass {
     }
     public interface  ISearchPresenter{
         void searchWord(String searchWord,int limit);
+    }
+    public interface ISongUrl{
+        void getSongUrl(String songId,String songUrl);
     }
     //      model层接口
     public interface ILoginModel{
@@ -43,9 +49,15 @@ public final class ContactClass {
     public interface IGetSearchContent{
         void getContent(String searchWord,int limit,IDataList iDataList);
     }
+    public interface IGetSongUrl{
+        void getSongUrl(String songId,IDataString iDataString);
+    }
     //modal层用来返回数据的接口
     public interface IDataList{
         void dataReturn(List<?> arrayList);
+    }
+    public interface IDataString{
+        void dataReturn(String songUrl);
     }
     //解析数据的接口
    /* public interface IAnalyzeData{

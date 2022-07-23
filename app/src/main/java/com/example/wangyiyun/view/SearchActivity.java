@@ -2,7 +2,6 @@ package com.example.wangyiyun.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,7 +19,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.example.wangyiyun.contacts.ContactClass;
@@ -34,7 +32,7 @@ import com.example.wangyiyun.presenter.SearchPresenter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements ContactClass.IView ,ContactClass.IView2{
+public class SearchActivity extends AppCompatActivity implements ContactClass.IView ,ContactClass.IView2,ContactClass.IView3{
     //布局控件
     private EditText mEditText;
     private Button mButton;
@@ -52,6 +50,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     //标记低第几页
     int page=0;
     private String searchWord;
+    private String songUrl;
     //recyclerview的适配器
     private SearchRecyclerViewAdapter searchRecyclerViewAdapter;
 
@@ -61,7 +60,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         setContentView(R.layout.activity_search);
         getWindow().setStatusBarColor(Color.rgb(255,255,255));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
-        searchPresenter=new SearchPresenter(this,this);
+        searchPresenter=new SearchPresenter(this,this,this);
         initControl();
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -178,10 +177,24 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 Log.d("zwyll",totalSongItems.get(position).getSongName());
                 Log.d("zwyll",songId);
                 String songPlayId="https://music.163.com/song/media/outer/url?id="+songId+".mp3";
-                MainActivity.songList.add(songPlayId);
-                Log.d("zwyee",MainActivity.songList.get(MainActivity.songList.size()-1));
-                MainActivity.iMusic.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
+                searchPresenter.getSongUrl(songId,songPlayId);
+
             }
         });
+    }
+
+    @Override
+    public void getData(String dataString,String dataString2) {
+        String songPlayId;
+        if(dataString.equals("null")){
+            songPlayId=dataString2;
+        }else {
+            songPlayId=dataString;
+        }
+        Log.d("zwylp",dataString);
+        Log.d("zwylp",dataString2);
+        MainActivity.songList.add(songPlayId);
+        Log.d("zwyee",MainActivity.songList.get(MainActivity.songList.size()-1));
+        MainActivity.iMusic.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
     }
 }
