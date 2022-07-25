@@ -88,7 +88,9 @@ public class MusicService extends Service {
     public static class MusicPlay extends Binder implements IMusic{
         private MediaPlayer mediaPlayer=new MediaPlayer();
         //判断有没有MediaPlayer准备过,true为没准备过
-        private boolean isPlay=true;
+        private volatile boolean isPlay=true;
+        //
+        volatile boolean isFirstPre=true;
         //记录歌曲播放到第几首
         int songNumber=0;
         List<String> songList;
@@ -113,9 +115,16 @@ public class MusicService extends Service {
                             if(songUrl.equals("null")){
                                 songUrl=songPlayId;
                             }
-                            mediaPlayer=new MediaPlayer();
-                            mediaPlayer.setDataSource(songUrl);//设置音源
-                            mediaPlayer.prepareAsync();
+                            if(isFirstPre){
+                                mediaPlayer.setDataSource(songUrl);//设置音源
+                                mediaPlayer.prepareAsync();
+                                isFirstPre=false;
+                            }else {
+                                mediaPlayer.reset();
+                                mediaPlayer.setDataSource(songUrl);//设置音源
+                                mediaPlayer.prepareAsync();
+                            }
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
