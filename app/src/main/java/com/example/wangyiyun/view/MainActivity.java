@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 
 import com.example.musicmelody.IMusic;
@@ -41,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static boolean play=false;
     static List<String> songList=new ArrayList<>();
     static MusicService.MusicPlay musicPlay;
-
     private final Runnable r = new Runnable() {
         @Override
         public void run() {
@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     seekBar.setMax(musicPlay.getMusicTotalTime());
                     Thread.sleep(70);
                     seekBar.setProgress(musicPlay.getMusicCurrentTime());
-                    Log.d("zwyee",String.valueOf(musicPlay.getMusicCurrentTime()));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -62,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        songList.add("https://music.163.com/song/media/outer/url?id=32192436.mp3");
-        songList.add("https://music.163.com/song/media/outer/url?id=415792881.mp3");
-        songList.add("https://music.163.com/song/media/outer/url?id=516657051.mp3");
-        songList.add("https://music.163.com/song/media/outer/url?id=468517654.mp3");
-        songList.add("https://music.163.com/song/media/outer/url?id=1498342485.mp3");
+        songList.add("32192436");
+        songList.add("415792881");
+        songList.add("516657051");
+        songList.add("468517654");
+//        songList.add("https://music.163.com/song/media/outer/url?id=1498342485.mp3");
         MusicService.songList=songList;
         //绑定服务
         //判断当前版本是否支持前台服务，不支持则开启后台服务
@@ -82,6 +81,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
         initPaper();
         initTabView();
+        initSongFunction();
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MainActivity.this,SearchActivity.class);//给后面开启的活动传值
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void initSongFunction(){
         mivMusicPlay=findViewById(R.id.iv_music_play);
         toolbar=findViewById(R.id.main_too_bar);
         ibNextSong =findViewById(R.id.ib_next_song);
@@ -90,7 +100,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 stopProgress();
-                musicPlay.nextSong();
+                HttpUtil.cachedThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        musicPlay.nextSong();
+                    }
+                });
                 mivMusicPlay.setSelected(true);
                 play=true;
                 startProgress();
@@ -100,7 +115,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 stopProgress();
-                musicPlay.preSong();
+                HttpUtil.cachedThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        musicPlay.preSong();
+                    }
+                });
                 mivMusicPlay.setSelected(true);
                 play=true;
                 startProgress();
@@ -116,26 +136,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            musicPlay.startMusic("https://music.163.com/song/media/outer/url?id=1964644539.mp3");
-                            startProgress();
+                            musicPlay.startMusic("29774171");
+;                           startProgress();
                         }
                     });
                 }else {
                     //音乐暂停
                     mivMusicPlay.setSelected(false);
                     play=false;
+                    Log.d("现在的线程为：", Thread.currentThread().getName());
                     musicPlay.stopMusic();
                     stopProgress();
                 }
 
-            }
-        });
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(MainActivity.this,SearchActivity.class);//给后面开启的活动传值
-                startActivity(intent);
             }
         });
     }

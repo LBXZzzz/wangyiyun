@@ -9,17 +9,31 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
+import android.widget.RemoteViews;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MusicService extends Service {
+    //存歌曲的ID
     public static List<String> songList=new ArrayList<>();
     private MusicPlay musicPlay=new MusicPlay(songList);
+
+
     public MusicService() {
     }
 
@@ -31,7 +45,13 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-//        判断是否为8.0版本以上
+        RemoteViews remoteViews=new RemoteViews(getPackageName(),R.layout.service_remote_view);
+        remoteViews.setImageViewResource(R.id.iv_service_music_photo,R.drawable.ic_music_stop);
+        sendDefaultNotification(remoteViews);
+    }
+
+    public void sendDefaultNotification(RemoteViews remoteViews){
+        //        判断是否为8.0版本以上
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 //            获取系统服务管理器
             NotificationManager manage = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -45,13 +65,12 @@ public class MusicService extends Service {
             Notification build = new NotificationCompat.Builder(this, id)
                     .setContentTitle("前台服务")
                     .setContentText("这是一个前台服务")
+                    .setContent(remoteViews)
                     .setWhen(System.currentTimeMillis())   //   当前时间
                     .setSmallIcon(R.drawable.music_tab)    //  图标
                     .setProgress(100, 10, false)   //   进度
                     .build();
-
             startForeground(1, build);
-//            manage.notify(1, build);
         }
     }
 
@@ -67,48 +86,92 @@ public class MusicService extends Service {
 
 
     public static class MusicPlay extends Binder implements IMusic{
-        private MediaPlayer mediaPlayer;
+        private MediaPlayer mediaPlayer=new MediaPlayer();
         //判断有没有MediaPlayer准备过,true为没准备过
         private boolean isPlay=true;
         //记录歌曲播放到第几首
         int songNumber=0;
-        List<String> songList=new ArrayList<>();
+        List<String> songList;
         public  MusicPlay(List<String> songList){
             this.songList=songList;
         }
-
         @Override
-        public void startMusic(String musicUrl) {
+        public void startMusic(String musicId) {
             if(isPlay){
-                try {
-                    mediaPlayer=new MediaPlayer();
-                    mediaPlayer.setDataSource(musicUrl);//设置音源
-                    mediaPlayer.prepareAsync();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                String url="https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/song/url?id="+musicId;
+                String songPlayId="https://music.163.com/song/media/outer/url?id="+musicId+".mp3";
+                returnData(url);
+                if(Looper.myLooper()==null){
+                    Looper.prepare();
                 }
-                isPlay=false;
+                Looper looper = Looper.myLooper();
+                handler=new Handler(looper){
+                    @Override
+                    public void handleMessage(@NonNull Message msg) {
+                        String songUrl=(String) msg.obj;
+                        try {
+                            if(songUrl.equals("null")){
+                                songUrl=songPlayId;
+                            }
+                            mediaPlayer=new MediaPlayer();
+                            mediaPlayer.setDataSource(songUrl);//设置音源
+                            mediaPlayer.prepareAsync();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        isPlay=false;
+                        super.handleMessage(msg);
+                        mediaPlayer.setOnPreparedListener((mediaPlayer -> {
+                            mediaPlayer.start();
+                        }));
+                    }
+                };
+                Looper.loop();
             }else {
                 mediaPlayer.start();
             }
-            mediaPlayer.setOnPreparedListener((mediaPlayer -> {
-                mediaPlayer.start();
-            }));
+        }
+
+        //获取歌曲id后拿来获取歌曲的url
+        private void returnData(String url){
+            HttpUtil.cachedThreadPool.execute(()->{
+                try {
+                    analyzeData(HttpUtil.get(url));
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        private Handler handler;
+        private void analyzeData(String s) throws JSONException {
+            JSONObject jsonObject=new JSONObject(s);
+            JSONArray jsonArray= jsonObject.optJSONArray("data");
+            JSONObject jsonObject1=jsonArray.getJSONObject(0);
+            String songUrl=jsonObject1.getString("url");
+            Message message=new Message();
+            message.obj=songUrl;
+            handler.sendMessage(message);
         }
 
 
         @Override
         public void stopMusic() {
-            if(mediaPlayer.isPlaying()){
-                mediaPlayer.pause();
+            if(mediaPlayer!=null){
+                try {
+                    if(mediaPlayer.isPlaying()){
+                        mediaPlayer.pause();
+                    }
+                }catch (Exception ignore){
+
+                }
+
             }
         }
 
         @Override
         public void nextSong() {
             if (!isPlay) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
+                mediaPlayer.reset();
                 isPlay = true;
             }
             if (songNumber==songList.size()-1){
@@ -122,8 +185,7 @@ public class MusicService extends Service {
         @Override
         public void preSong() {
             if (!isPlay) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
+                mediaPlayer.reset();
                 isPlay = true;
             }
             if (songNumber==0){
@@ -131,18 +193,22 @@ public class MusicService extends Service {
             }else {
                 songNumber-=1;
             }
-
             startMusic(songList.get(songNumber));
         }
 
         @Override
         public void playMode() {
-
         }
 
         @Override
         public int getMusicTotalTime() {
-            return mediaPlayer.getDuration();
+            int i=0;
+            try {
+                i=mediaPlayer.getDuration();
+            }catch (Exception ignore){
+
+            }
+            return i;
         }
 
         @Override
@@ -157,13 +223,12 @@ public class MusicService extends Service {
         }
 
         @Override
-        public void openMusic(String musicUrl) {
+        public void openMusic(String musicId) {
             if (!isPlay) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
+                mediaPlayer.reset();
                 isPlay = true;
             }
-            startMusic(musicUrl);
+            startMusic(musicId);
         }
     }
 

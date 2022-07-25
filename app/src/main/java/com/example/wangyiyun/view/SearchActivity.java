@@ -175,10 +175,13 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             @Override
             public void onItemClick(View view, int position) {
                 String songId=totalSongItems.get(position).getSongId();
-                Log.d("zwyll",totalSongItems.get(position).getSongName());
-                Log.d("zwyll",songId);
                 String songPlayId="https://music.163.com/song/media/outer/url?id="+songId+".mp3";
                 searchPresenter.getSongUrl(songId,songPlayId);
+                MainActivity.songList.add(songId);
+                MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
+                Log.d("zwyuujj","ppppppppppfjhvdfs");
+                MainActivity.mivMusicPlay.setSelected(true);
+                MainActivity.play=true;
             }
         });
     }
@@ -192,9 +195,5 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             songPlayId=dataString;
             Toast.makeText(SearchActivity.this, "VIP歌曲，试听30秒", Toast.LENGTH_SHORT).show();
         }
-        MainActivity.songList.add(songPlayId);
-        MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
-        MainActivity.mivMusicPlay.setSelected(true);
-        MainActivity.play=true;
     }
 }

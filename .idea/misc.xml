@@ -16,6 +16,7 @@
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_music_normal.xml" value="0.1885" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_music_pause.xml" value="0.333" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_music_play.xml" value="0.333" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_music_press.xml" value="0.261" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_next_song.xml" value="0.333" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_previous__song.xml" value="0.333" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/drawable/ic_search.xml" value="0.127" />
@@ -42,9 +43,11 @@
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/layout/recycler_footer.xml" value="0.3625" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/layout/recycler_view_item_search.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/layout/search_recycler_view_item.xml" value="0.3625" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/layout/service_remote_view.xml" value="0.35520833333333335" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/xml/network_security_config.xml" value="0.307518115942029" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/xml/xml.xml" value="0.18177083333333333" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/ic_music_start.xml" value="0.1" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/ic_music_stop.xml" value="0.3635" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/music_tab.xml" value="0.3635" />
       </map>
     </option>
