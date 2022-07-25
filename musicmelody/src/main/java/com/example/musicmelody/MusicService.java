@@ -13,9 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -29,11 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicService extends Service {
+
     //存歌曲的ID
-    public static List<String> songList=new ArrayList<>();
-    private MusicPlay musicPlay=new MusicPlay(songList);
-
-
+    public static List<SongItem> songItemList =new ArrayList<>();
+    private MusicPlay musicPlay=new MusicPlay(songItemList);
+    //
+    NotificationManager manage;
     public MusicService() {
     }
 
@@ -54,7 +53,7 @@ public class MusicService extends Service {
         //        判断是否为8.0版本以上
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 //            获取系统服务管理器
-            NotificationManager manage = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manage = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             String id = "通知id";
             String name = "通知分类名称";
 //            建立通知通道
@@ -85,7 +84,7 @@ public class MusicService extends Service {
     }
 
 
-    public static class MusicPlay extends Binder implements IMusic{
+    public class MusicPlay extends Binder implements IMusic{
         private MediaPlayer mediaPlayer=new MediaPlayer();
         //判断有没有MediaPlayer准备过,true为没准备过
         private volatile boolean isPlay=true;
@@ -93,15 +92,19 @@ public class MusicService extends Service {
         volatile boolean isFirstPre=true;
         //记录歌曲播放到第几首
         int songNumber=0;
-        List<String> songList;
-        public  MusicPlay(List<String> songList){
+        List<SongItem> songList;
+        public  MusicPlay(List<SongItem> songList){
             this.songList=songList;
         }
         @Override
-        public void startMusic(String musicId) {
+        public void startMusic(SongItem songItem) {
             if(isPlay){
+                String musicId=songItem.getSongId();
                 String url="https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/song/url?id="+musicId;
                 String songPlayId="https://music.163.com/song/media/outer/url?id="+musicId+".mp3";
+                //更新通知
+                RemoteViews remoteViews=new RemoteViews(getPackageName(),R.layout.service_remote_view);
+                remoteViews.setImageViewResource(R.id.iv_service_music_photo,R.drawable.ic_music_stop);
                 returnData(url);
                 if(Looper.myLooper()==null){
                     Looper.prepare();
@@ -232,12 +235,12 @@ public class MusicService extends Service {
         }
 
         @Override
-        public void openMusic(String musicId) {
+        public void openMusic(SongItem songItem) {
             if (!isPlay) {
                 mediaPlayer.reset();
                 isPlay = true;
             }
-            startMusic(musicId);
+            startMusic(songItem);
         }
     }
 

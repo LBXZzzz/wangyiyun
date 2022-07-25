@@ -82,7 +82,6 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                     if (lastItemPosition == (itemCount - 1) ) {
                         //加载更多
                         page+=1;
-                        Log.d("zwyupi",String.valueOf(page));
                         searchPresenter.searchWord(searchWord,page);
                     }
                 }
@@ -174,12 +173,13 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         searchRecyclerViewAdapter.setOnItemClickListener(new ContactClass.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                String singerName=totalSongItems.get(position).getSingerName();
+                String songName=totalSongItems.get(position).getSongName();
                 String songId=totalSongItems.get(position).getSongId();
-                String songPlayId="https://music.163.com/song/media/outer/url?id="+songId+".mp3";
-                searchPresenter.getSongUrl(songId,songPlayId);
-                MainActivity.songList.add(songId);
+                String picUrl=totalSongItems.get(position).getPicUrl();
+                com.example.musicmelody.SongItem songItem=new com.example.musicmelody.SongItem(singerName,songName,songId,picUrl);
+                MainActivity.songList.add(songItem);
                 MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
-                Log.d("zwyuujj","ppppppppppfjhvdfs");
                 MainActivity.mivMusicPlay.setSelected(true);
                 MainActivity.play=true;
             }

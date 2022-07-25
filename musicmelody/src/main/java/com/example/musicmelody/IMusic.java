@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IMusic {
     //开始播放音乐
-    void startMusic(String musicUrl);
+    void startMusic(SongItem songItem);
     //暂停音乐
     void stopMusic();
     //下一首播放
@@ -18,5 +18,5 @@ public interface IMusic {
     //获取音乐当前时间
     int getMusicCurrentTime();
     //
-    void openMusic(String musicUrl);
+    void openMusic(SongItem songItem);
 }

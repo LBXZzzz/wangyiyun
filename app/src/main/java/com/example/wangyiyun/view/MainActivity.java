@@ -17,12 +17,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RemoteViews;
 import android.widget.SeekBar;
 
-import com.example.musicmelody.IMusic;
-import com.example.musicmelody.MusicPlayOk;
 import com.example.musicmelody.MusicService;
+import com.example.musicmelody.SongItem;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.utils.HttpUtil;
 
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean isTime=false;
     //判断歌曲是否有在播放
     static boolean play=false;
-    static List<String> songList=new ArrayList<>();
+    static List<SongItem> songList=new ArrayList<>();
     static MusicService.MusicPlay musicPlay;
     private final Runnable r = new Runnable() {
         @Override
@@ -61,12 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        songList.add("32192436");
-        songList.add("415792881");
-        songList.add("516657051");
-        songList.add("468517654");
-//        songList.add("https://music.163.com/song/media/outer/url?id=1498342485.mp3");
-        MusicService.songList=songList;
+        MusicService.songItemList =songList;
         //绑定服务
         //判断当前版本是否支持前台服务，不支持则开启后台服务
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -92,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initSongFunction(){
+        SongItem songItem=new SongItem("薛之谦","怪咖","574921549","http://p4.music.126.net/TOkRGd59o3hAOKsnMMmMMA==/109951163755246383.jpg");
         mivMusicPlay=findViewById(R.id.iv_music_play);
         toolbar=findViewById(R.id.main_too_bar);
         ibNextSong =findViewById(R.id.ib_next_song);
@@ -136,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            musicPlay.startMusic("29774171");
+                            musicPlay.startMusic(songItem);
 ;                           startProgress();
                         }
                     });
@@ -148,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     musicPlay.stopMusic();
                     stopProgress();
                 }
-
             }
         });
     }
