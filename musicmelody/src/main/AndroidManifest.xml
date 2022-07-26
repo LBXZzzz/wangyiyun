@@ -5,10 +5,14 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
+        <activity
+            android:name=".MusicActivity"
+            android:exported="false" />
+
         <service
             android:name=".MusicService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -50,7 +50,7 @@ public class GetSearchContent implements ContactClass.IGetSearchContent {
             JSONObject jsonObject3=jsonArray1.getJSONObject(0);
             JSONObject jsonObject4=jsonObject2.getJSONObject("al");
             SongItem songItem=new SongItem(jsonObject3.getString("name"),jsonObject2.getString("name"),
-                                            jsonObject2.getString("id"),jsonObject4.getString("picUrl")+"?param=150y150");
+                                            jsonObject2.getString("id"),jsonObject4.getString("picUrl"));
             list.add(songItem);
         }
         Message message=new Message();

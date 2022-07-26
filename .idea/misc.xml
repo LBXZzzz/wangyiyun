@@ -46,9 +46,14 @@
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/layout/service_remote_view.xml" value="0.35520833333333335" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/xml/network_security_config.xml" value="0.307518115942029" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/app/src/main/res/xml/xml.xml" value="0.18177083333333333" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/ic_android_black_24dp.xml" value="0.258" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/ic_music_start.xml" value="0.1" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/ic_music_stop.xml" value="0.3635" />
         <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/drawable/music_tab.xml" value="0.3635" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/layout/activity_music.xml" value="0.2682291666666667" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/layout/music_player.xml" value="0.2526041666666667" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/layout/notification.xml" value="0.3625" />
+        <entry key="..\:/Users/16956/AndroidStudioProjects/WangYiYun/musicmelody/src/main/res/layout/service_remote_view.xml" value="0.2526041666666667" />
       </map>
     </option>
   </component>

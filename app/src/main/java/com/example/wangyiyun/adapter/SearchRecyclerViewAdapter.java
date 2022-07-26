@@ -66,7 +66,7 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             (((ViewHolder)holder).textView).setText(songItem.getSongName());
             (((ViewHolder)holder).textView1).setText(songItem.getSingerName());
             Picasso.with(mContext)
-                    .load(songItem.getPicUrl())
+                    .load(songItem.getPicUrl()+"?param=150y150")
                     .resize(150,150)
                     .placeholder(R.drawable.ic_android_black_24dp)
                     .into(((ViewHolder) holder).imageView);
