@@ -9,10 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +76,7 @@ public class MusicService extends Service {
                     .setContentText("这是一个前台服务")
                     .setContent(remoteViews)
                     .setWhen(System.currentTimeMillis())   //   当前时间
-                    .setSmallIcon(R.drawable.music_tab)    //  图标
+                    .setSmallIcon(R.drawable.ic_music_normal)    //  图标
                     .setProgress(100, 10, false)   //   进度
                     .build();
             startForeground(1, notification);
@@ -98,7 +101,7 @@ public class MusicService extends Service {
         //判断是否需要释放
         volatile boolean isFirstPre = true;
         //记录歌曲播放到第几首
-        int songNumber = 0;
+        private int songNumber = 0;
         //存储播放列表的集合
         List<SongItem> songList;
 
@@ -116,13 +119,26 @@ public class MusicService extends Service {
                 //更新通知
                 remoteViews.setTextViewText(R.id.tv_notification_song_name, songItem.getSongName());
                 remoteViews.setTextViewText(R.id.tv_notification_singer_name, songItem.getSingerName());
-                Picasso.with(getApplicationContext()).load(songItem.getPicUrl() + "?param=200y200").into(remoteViews, R.id.iv_notification_music_photo, 1, notification);
+                Log.d("11现在的线程为：", Thread.currentThread().getName());
+                handler=new Handler(Looper.getMainLooper()){
+                    @Override
+                    public void handleMessage(@NonNull Message msg) {
+                        Picasso.with(getApplicationContext()).load(songItem.getPicUrl() + "?param=200y200").into(remoteViews, R.id.iv_notification_music_photo, 1, notification);
+                        super.handleMessage(msg);
+                    }
+                };
                 notificationManager.notify(1, notification);
                 returnData(url);
                 if (Looper.myLooper() == null) {
                     Looper.prepare();
                 }
                 Looper looper = Looper.myLooper();
+                Intent intent = new Intent(MusicService.this,MusicActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("SongList", (Serializable)songItem);
+                intent.putExtras(bundle);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 handler = new Handler(looper) {
                     @Override
                     public void handleMessage(@NonNull Message msg) {

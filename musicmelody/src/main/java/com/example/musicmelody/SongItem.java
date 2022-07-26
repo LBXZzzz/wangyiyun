@@ -1,6 +1,8 @@
 package com.example.musicmelody;
 
-public class SongItem {
+import java.io.Serializable;
+
+public class SongItem implements Serializable {
     private String singerName;
     private String songName;
     private String songId;
