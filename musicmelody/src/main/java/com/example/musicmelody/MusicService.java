@@ -117,6 +117,7 @@ public class MusicService extends Service {
         @Override
         public void startMusic(SongItem songItem) {
             if (isPlay) {
+                Log.d("zwyupu",String.valueOf(songList.size()));
                 isPreSee=false;
                 mediaPlayer.setOnCompletionListener(this);
                 mediaPlayer.setOnErrorListener(this);
@@ -307,22 +308,25 @@ public class MusicService extends Service {
         public void onCompletion(MediaPlayer mp) {
             Log.d("zwu",String.valueOf(playPattern));
             if (playPattern==1){
-                mediaPlayer.setLooping(false);
-                Log.d("zwyrr1","{{{{{{{{");
                 nextSong();
             }else if(playPattern==2){
                 startMusic(songList.get(songNumber));
-                Log.d("zwyrr2","{{{{{{{{");
             }else if(playPattern==3){
+                Log.d("zwyu【u",String.valueOf(songList.size()));
                 if(songItemListRandom.size()==0){
-                    songItemListRandom=songList;
+                    Log.d("zwyrr","}}}}}}");
+                    songItemListRandom.addAll(songList);
                 }
-                Log.d("zwyrr3","{{{{{{{{");
                 songItemListRandom.remove(songNumber);
-                mediaPlayer.setLooping(false);
                 Random random=new Random();
+                Log.d("zwyu【u",String.valueOf(songList.size()));
                 Log.d("zwyuu",String.valueOf(songItemListRandom.size()));
-                int x=random.nextInt(songItemListRandom.size());
+                int x=0;
+                if(songItemListRandom.size()==1){
+                    x=0;
+                }else {
+                    x=random.nextInt(songItemListRandom.size());
+                }
                 SongItem songItemRandom=songItemListRandom.get(x);
                 Log.d("zwpe",songItemRandom.getSongName());
                 startMusic(songItemRandom);
