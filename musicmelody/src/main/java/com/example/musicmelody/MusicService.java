@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MusicService extends Service {
 
@@ -103,9 +104,12 @@ public class MusicService extends Service {
         //记录歌曲播放到第几首
         private int songNumber = 0;
         //存储播放列表的集合
-        List<SongItem> songList;
+        private List<SongItem> songList;
+        //存随机播放的歌曲信息
+        private List<SongItem> songItemListRandom = new ArrayList<>();
+        //播放播放模式,1为列表播放，2为单循环，3为随机播放
+        private int playPattern=1;
 
-        //
         public MusicPlay(List<SongItem> songList) {
             this.songList = songList;
         }
@@ -139,7 +143,9 @@ public class MusicService extends Service {
                 Looper looper = Looper.myLooper();
                 Intent intent = new Intent(MusicService.this,MusicActivity.class);
                 Bundle bundle = new Bundle();
+                Log.d("zwu",String.valueOf(playPattern));
                 bundle.putSerializable("SongList", (Serializable)songItem);
+                bundle.putInt("playMode",playPattern);
                 intent.putExtras(bundle);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -244,10 +250,6 @@ public class MusicService extends Service {
         }
 
         @Override
-        public void playMode() {
-        }
-
-        @Override
         public int getMusicTotalTime() {
             int i = 0;
             try {
@@ -279,8 +281,49 @@ public class MusicService extends Service {
         }
 
         @Override
+        public int playModeInt() {
+            return playPattern;
+        }
+
+        @Override
+        public int playMode() {
+            //播放播放模式,1为列表播放，2为单循环，3为随机播放
+            if(playPattern==1){
+                playPattern=2;
+                return playPattern;
+            }
+            if(playPattern==2){
+                playPattern=3;
+                return playPattern;
+            }
+            if(playPattern==3){
+                playPattern=1;
+                return playPattern;
+            }
+            return playPattern;
+        }
+
+        @Override
         public void onCompletion(MediaPlayer mp) {
-            nextSong();
+            Log.d("zwu",String.valueOf(playPattern));
+            if (playPattern==1){
+                mediaPlayer.setLooping(false);
+                nextSong();
+            }else if(playPattern==2){
+                mediaPlayer.setLooping(true);
+            }else if(playPattern==3){
+                if(songItemListRandom.size()==0){
+                    songItemListRandom=songList;
+                }
+                songItemListRandom.remove(songNumber);
+                mediaPlayer.setLooping(false);
+                Random random=new Random();
+                int x=random.nextInt(songItemListRandom.size());
+                SongItem songItemRandom=songItemListRandom.get(x);
+                Log.d("zwpe",songItemRandom.getSongName());
+                startMusic(songItemRandom);
+                songItemListRandom.remove(x);
+            }
         }
 
         @Override

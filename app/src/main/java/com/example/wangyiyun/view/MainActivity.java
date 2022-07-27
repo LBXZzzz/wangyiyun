@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar=findViewById(R.id.main_too_bar);
         ibNextSong =findViewById(R.id.ib_next_song);
         ibPreSong=findViewById(R.id.ib_pre_song);
-        ibNextSong.setOnClickListener(new View.OnClickListener() {
+        /*ibNextSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopProgress();
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     stopProgress();
                 }
             }
-        });
+        });*/
     }
 
     private void startProgress(){

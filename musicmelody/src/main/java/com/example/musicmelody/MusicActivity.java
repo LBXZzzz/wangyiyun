@@ -24,7 +24,7 @@ public class MusicActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private SeekBar mSeekBar;
     private MusicService.MusicPlay musicPlay;
-    private ImageView mivNextSong,mivPreSong;
+    private ImageView mivNextSong,mivPreSong,mivPlayMode;
     private SongItem songItem;
     boolean isTime=false;
     //判断歌曲是否有在播放
@@ -34,16 +34,30 @@ public class MusicActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music);
-        initControl();
         //设置状态栏的背景颜色和字体颜色
         getWindow().setStatusBarColor(Color.rgb(255,255,255));
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         Intent bindIntent=new Intent(this,MusicService.class);
         bindService(bindIntent,connection,BIND_AUTO_CREATE);
+        //初始化控件
+        initControl();
         //接收歌曲信息
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         songItem= (SongItem) bundle.getSerializable("SongList");
+        int playMode=bundle.getInt("playMode");
+        Log.d("zwui",String.valueOf(playMode));
+        switch(playMode){
+            case 1:
+                mivPlayMode.setImageResource(R.drawable.ic_list_play);
+                break;
+            case 2:
+                mivPlayMode.setImageResource(R.drawable.ic_loop_playback);
+                break;
+            case 3:
+                mivPlayMode.setImageResource(R.drawable.ic_random_play);
+                break;
+        }
         //加载歌曲的名字和歌手名字
         mTextView1.setText(songItem.getSongName()+"-");
         mTextView2.setText(songItem.getSingerName());
@@ -57,11 +71,11 @@ public class MusicActivity extends AppCompatActivity {
                 finish();
             }
         });
-        mPlayImageView.setSelected(true);
         initSongFunction();
     }
 
     private void initSongFunction() {
+        mPlayImageView.setSelected(true);
         mPlayImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +136,25 @@ public class MusicActivity extends AppCompatActivity {
                 startProgress();
             }
         });
+        mivPlayMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //播放播放模式,1为列表播放，2为单循环，3为随机播放
+                int playInt=musicPlay.playMode();
+                switch(playInt){
+                    case 1:
+                        mivPlayMode.setImageResource(R.drawable.ic_list_play);
+                        break;
+                    case 2:
+                        mivPlayMode.setImageResource(R.drawable.ic_loop_playback);
+                        break;
+                    case 3:
+                        mivPlayMode.setImageResource(R.drawable.ic_random_play);
+                        break;
+                }
+
+            }
+        });
     }
 
     private void initControl() {
@@ -134,6 +167,7 @@ public class MusicActivity extends AppCompatActivity {
         mSeekBar=findViewById(R.id.seekbar_service);
         mivNextSong=findViewById(R.id.iv_next_song_service);
         mivPreSong=findViewById(R.id.iv_pre_song_service);
+        mivPlayMode=findViewById(R.id.iv_play_mode_service);
     }
 
     private final Runnable r = new Runnable() {

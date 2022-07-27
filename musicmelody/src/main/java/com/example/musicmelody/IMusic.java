@@ -12,11 +12,13 @@ public interface IMusic {
     //上一首播放
     void preSong();
     //播放模式，单曲循环...
-    void playMode();
+    int playMode();
     //获取音乐的总时间
     int getMusicTotalTime ();
     //获取音乐当前时间
     int getMusicCurrentTime();
     //
     void openMusic(SongItem songItem);
+    //获取播放模式
+    int playModeInt();
 }
