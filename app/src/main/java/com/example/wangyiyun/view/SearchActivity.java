@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.musicmelody.MusicService;
 import com.example.wangyiyun.contacts.ContactClass;
 import com.example.wangyiyun.R;
 import com.example.wangyiyun.ViewByMyself.WaterFlowLayout;
@@ -38,7 +39,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     private EditText mEditText;
     private Button mButton;
     private WaterFlowLayout mWaterFlowLayout;
-    private LinearLayout mLinearLayout,mLinearLayout1;
+    private LinearLayout mLinearLayout,mLinearLayout1,mLinearLayout2;
     private ProgressBar mProgressBar;
     private RecyclerView mRecyclerView;
     //数据相关
@@ -66,6 +67,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mLinearLayout.setVisibility(View.GONE);
+        mLinearLayout2.setVisibility(View.GONE);
         searchPresenter.bridge();
         controlFunction();
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -98,6 +100,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         mProgressBar=findViewById(R.id.pb_serrch);
         mRecyclerView=findViewById(R.id.search_activity_recyclerview);
         mLinearLayout1=findViewById(R.id.ly_history);
+        mLinearLayout2=findViewById(R.id.lly_search_recyclerview);
     }
 
     //控件的功能
@@ -108,7 +111,6 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 //这里写事件，返回为true，即为搜索键的事件
                 searchWord=mEditText.getText().toString();
-                Log.d("zwyz",searchWord);
                 searchPresenter.searchWord(searchWord,0);
                 mProgressBar.setVisibility(View.VISIBLE);
                 mLinearLayout.setVisibility(View.GONE);
@@ -163,6 +165,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         totalSongItems.addAll(songItems);
         mProgressBar.setVisibility(View.GONE);
         mLinearLayout1.setVisibility(View.GONE);
+        mLinearLayout2.setVisibility(View.VISIBLE);
         if(page==0){
             mLinearLayout.setVisibility(View.GONE);
             searchRecyclerViewAdapter=new SearchRecyclerViewAdapter(getApplicationContext(),songItems);
@@ -180,6 +183,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 com.example.musicmelody.SongItem songItem=new com.example.musicmelody.SongItem(singerName,songName,songId,picUrl);
                 MainActivity.songList.add(songItem);
                 MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size()-1));
+                MusicService.songNumber=MainActivity.songList.size()-1;
                 MainActivity.mivMusicPlay.setSelected(true);
                 MainActivity.play=true;
             }

@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -47,6 +48,7 @@ public class MusicActivity extends AppCompatActivity {
         songItem= (SongItem) bundle.getSerializable("SongList");
         int playMode=bundle.getInt("playMode");
         Log.d("zwui",String.valueOf(playMode));
+        //播放播放模式,1为列表播放，2为单循环，3为随机播放
         switch(playMode){
             case 1:
                 mivPlayMode.setImageResource(R.drawable.ic_list_play);
@@ -79,6 +81,7 @@ public class MusicActivity extends AppCompatActivity {
         mPlayImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                musicPlay.playMode();
                 if(!play){
                     //写音乐播放事件
                     mPlayImageView.setSelected(true);
@@ -144,12 +147,15 @@ public class MusicActivity extends AppCompatActivity {
                 switch(playInt){
                     case 1:
                         mivPlayMode.setImageResource(R.drawable.ic_list_play);
+                        Toast.makeText(getApplicationContext(), "列表播放", Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
                         mivPlayMode.setImageResource(R.drawable.ic_loop_playback);
+                        Toast.makeText(getApplicationContext(), "单曲循环", Toast.LENGTH_SHORT).show();
                         break;
                     case 3:
                         mivPlayMode.setImageResource(R.drawable.ic_random_play);
+                        Toast.makeText(getApplicationContext(), "随机播放", Toast.LENGTH_SHORT).show();
                         break;
                 }
 
@@ -174,13 +180,13 @@ public class MusicActivity extends AppCompatActivity {
         @Override
         public void run() {
             while (isTime){
-                try {
-                    mSeekBar.setMax(musicPlay.getMusicTotalTime());
-                    Thread.sleep(70);
-                    mSeekBar.setProgress(musicPlay.getMusicCurrentTime());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        mSeekBar.setMax(musicPlay.getMusicTotalTime());
+                        Thread.sleep(70);
+                        mSeekBar.setProgress(musicPlay.getMusicCurrentTime());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
             }
         }
     };

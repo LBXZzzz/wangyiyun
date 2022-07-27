@@ -90,6 +90,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <LinearLayout
+        android:id="@+id/lly_search_recyclerview"
         android:layout_marginTop="20dp"
         android:layout_width="330dp"
         android:layout_gravity="center"

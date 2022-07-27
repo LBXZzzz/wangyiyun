@@ -27,7 +27,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,11 +35,11 @@ public class MusicService extends Service {
 
     //存歌曲的ID
     public static List<SongItem> songItemList = new ArrayList<>();
-    private MusicPlay musicPlay = new MusicPlay(songItemList);
-    //
+    private final MusicPlay musicPlay = new MusicPlay(songItemList);
+    public static int songNumber = 0;
+
     RemoteViews remoteViews;
     NotificationManager notificationManager;
-    private static final String id = "1";
     Notification notification;
 
     public MusicService() {
@@ -96,19 +95,20 @@ public class MusicService extends Service {
 
 
     public class MusicPlay extends Binder implements IMusic,MediaPlayer.OnCompletionListener,MediaPlayer.OnErrorListener {
-        private MediaPlayer mediaPlayer = new MediaPlayer();
+        private final MediaPlayer mediaPlayer = new MediaPlayer();
         //判断有没有MediaPlayer准备过,true为没准备过
         private volatile boolean isPlay = true;
         //判断是否需要释放
         volatile boolean isFirstPre = true;
         //记录歌曲播放到第几首
-        private int songNumber = 0;
         //存储播放列表的集合
         private List<SongItem> songList;
         //存随机播放的歌曲信息
         private List<SongItem> songItemListRandom = new ArrayList<>();
         //播放播放模式,1为列表播放，2为单循环，3为随机播放
         private int playPattern=1;
+        //判断是否准备好了,0是准备好了，1是未准备好
+        private boolean isPreSee=false;
 
         public MusicPlay(List<SongItem> songList) {
             this.songList = songList;
@@ -117,6 +117,7 @@ public class MusicService extends Service {
         @Override
         public void startMusic(SongItem songItem) {
             if (isPlay) {
+                isPreSee=false;
                 mediaPlayer.setOnCompletionListener(this);
                 mediaPlayer.setOnErrorListener(this);
                 String musicId = songItem.getSongId();
@@ -143,8 +144,7 @@ public class MusicService extends Service {
                 Looper looper = Looper.myLooper();
                 Intent intent = new Intent(MusicService.this,MusicActivity.class);
                 Bundle bundle = new Bundle();
-                Log.d("zwu",String.valueOf(playPattern));
-                bundle.putSerializable("SongList", (Serializable)songItem);
+                bundle.putSerializable("SongList", songItem);
                 bundle.putInt("playMode",playPattern);
                 intent.putExtras(bundle);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -172,9 +172,13 @@ public class MusicService extends Service {
                         }
                         isPlay = false;
                         super.handleMessage(msg);
-                        mediaPlayer.setOnPreparedListener((mediaPlayer -> {
-                            mediaPlayer.start();
-                        }));
+                        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                isPreSee=true;
+                                mediaPlayer.start();
+                            }
+                        });
                     }
                 };
                 Looper.loop();
@@ -209,15 +213,11 @@ public class MusicService extends Service {
 
         @Override
         public void stopMusic() {
-            if (mediaPlayer != null) {
                 try {
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
                     }
                 } catch (Exception ignore) {
-
-                }
-
             }
         }
 
@@ -308,16 +308,20 @@ public class MusicService extends Service {
             Log.d("zwu",String.valueOf(playPattern));
             if (playPattern==1){
                 mediaPlayer.setLooping(false);
+                Log.d("zwyrr1","{{{{{{{{");
                 nextSong();
             }else if(playPattern==2){
-                mediaPlayer.setLooping(true);
+                startMusic(songList.get(songNumber));
+                Log.d("zwyrr2","{{{{{{{{");
             }else if(playPattern==3){
                 if(songItemListRandom.size()==0){
                     songItemListRandom=songList;
                 }
+                Log.d("zwyrr3","{{{{{{{{");
                 songItemListRandom.remove(songNumber);
                 mediaPlayer.setLooping(false);
                 Random random=new Random();
+                Log.d("zwyuu",String.valueOf(songItemListRandom.size()));
                 int x=random.nextInt(songItemListRandom.size());
                 SongItem songItemRandom=songItemListRandom.get(x);
                 Log.d("zwpe",songItemRandom.getSongName());

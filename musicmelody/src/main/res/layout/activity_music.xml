@@ -92,7 +92,7 @@
                 <ImageView
                     android:id="@+id/iv_play_mode_service"
                     android:padding="10dp"
-                    android:layout_width="40dp"
+                    android:layout_width="50dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_list_play"
                     android:background="@drawable/linearlayout_water_selector"/>

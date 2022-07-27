@@ -21,4 +21,5 @@ public interface IMusic {
     void openMusic(SongItem songItem);
     //获取播放模式
     int playModeInt();
+
 }
