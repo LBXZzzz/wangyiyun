@@ -94,7 +94,7 @@ public class MusicService extends Service {
     }
 
 
-    public class MusicPlay extends Binder implements IMusic {
+    public class MusicPlay extends Binder implements IMusic,MediaPlayer.OnCompletionListener,MediaPlayer.OnErrorListener {
         private MediaPlayer mediaPlayer = new MediaPlayer();
         //判断有没有MediaPlayer准备过,true为没准备过
         private volatile boolean isPlay = true;
@@ -113,20 +113,24 @@ public class MusicService extends Service {
         @Override
         public void startMusic(SongItem songItem) {
             if (isPlay) {
+                mediaPlayer.setOnCompletionListener(this);
+                mediaPlayer.setOnErrorListener(this);
                 String musicId = songItem.getSongId();
                 String url = "https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/song/url?id=" + musicId;
                 String songPlayId = "https://music.163.com/song/media/outer/url?id=" + musicId + ".mp3";
                 //更新通知
                 remoteViews.setTextViewText(R.id.tv_notification_song_name, songItem.getSongName());
                 remoteViews.setTextViewText(R.id.tv_notification_singer_name, songItem.getSingerName());
-                Log.d("11现在的线程为：", Thread.currentThread().getName());
                 handler=new Handler(Looper.getMainLooper()){
                     @Override
                     public void handleMessage(@NonNull Message msg) {
-                        Picasso.with(getApplicationContext()).load(songItem.getPicUrl() + "?param=200y200").into(remoteViews, R.id.iv_notification_music_photo, 1, notification);
-                        super.handleMessage(msg);
+                        String photoUrl = (String) msg.obj;
+                        Picasso.with(getApplicationContext()).load(photoUrl).into(remoteViews, R.id.iv_notification_music_photo, 1, notification);
                     }
                 };
+                Message message = new Message();
+                message.obj = songItem.getPicUrl()+ "?param=200y200";
+                handler.sendMessage(message);
                 notificationManager.notify(1, notification);
                 returnData(url);
                 if (Looper.myLooper() == null) {
@@ -272,6 +276,16 @@ public class MusicService extends Service {
                 isPlay = true;
             }
             startMusic(songItem);
+        }
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            nextSong();
+        }
+
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+            return true;
         }
     }
 

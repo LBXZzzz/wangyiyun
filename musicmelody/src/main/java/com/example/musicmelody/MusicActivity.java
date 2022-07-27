@@ -48,6 +48,7 @@ public class MusicActivity extends AppCompatActivity {
         mTextView1.setText(songItem.getSongName()+"-");
         mTextView2.setText(songItem.getSingerName());
         //加载歌曲图片
+        Log.d("现在的线程为：", Thread.currentThread().getName());
         Picasso.with(this).load(songItem.getPicUrl()).placeholder(R.drawable.ic_music_start).into(mSongImageView);
         //给界面的返回键设置返回事件
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -57,9 +58,7 @@ public class MusicActivity extends AppCompatActivity {
             }
         });
         mPlayImageView.setSelected(true);
-        startProgress();
         initSongFunction();
-
     }
 
     private void initSongFunction() {
