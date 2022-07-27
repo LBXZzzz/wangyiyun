@@ -74,6 +74,7 @@ public class MusicActivity extends AppCompatActivity {
             }
         });
         initSongFunction();
+
     }
 
     private void initSongFunction() {
@@ -97,7 +98,6 @@ public class MusicActivity extends AppCompatActivity {
                     //音乐暂停
                     mPlayImageView.setSelected(false);
                     play=false;
-                    Log.d("现在的线程为：", Thread.currentThread().getName());
                     musicPlay.stopMusic();
                     stopProgress();
                 }
@@ -204,6 +204,7 @@ public class MusicActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             musicPlay=(MusicService.MusicPlay)service;
+            startProgress();
         }
 
         @Override
