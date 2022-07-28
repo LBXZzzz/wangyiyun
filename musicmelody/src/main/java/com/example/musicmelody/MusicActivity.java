@@ -3,8 +3,11 @@ package com.example.musicmelody;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,6 +22,9 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MusicActivity extends AppCompatActivity {
     private ImageView mSongImageView, mPlayImageView;
     private TextView mTextView1, mTextView2;
@@ -30,11 +36,16 @@ public class MusicActivity extends AppCompatActivity {
     boolean isTime = false;
     //判断歌曲是否有在播放
     static boolean play = false;
+    //
+    List<SongItem> songItemList = new ArrayList<>();
+    int number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music);
+        songItemList = MusicService.songItemList;
+        number = MusicService.songNumber;
         //设置状态栏的背景颜色和字体颜色
         getWindow().setStatusBarColor(Color.rgb(255, 255, 255));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -47,7 +58,8 @@ public class MusicActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         songItem = (SongItem) bundle.getSerializable("SongList");
         int playMode = bundle.getInt("playMode");
-        Log.d("zwui", String.valueOf(playMode));
+        updateView();
+        //给界面的返回键设置返回事件
         //播放播放模式,1为列表播放，2为单循环，3为随机播放
         switch (playMode) {
             case 1:
@@ -60,21 +72,11 @@ public class MusicActivity extends AppCompatActivity {
                 mivPlayMode.setImageResource(R.drawable.ic_random_play);
                 break;
         }
-        //加载歌曲的名字和歌手名字
-        mTextView1.setText(songItem.getSongName() + "-");
-        mTextView2.setText(songItem.getSingerName());
-        //加载歌曲图片
-        Log.d("现在的线程为：", Thread.currentThread().getName());
-        Picasso.with(this).load(songItem.getPicUrl()).placeholder(R.drawable.ic_music_start).into(mSongImageView);
-        //给界面的返回键设置返回事件
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
         initSongFunction();
-
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("UPDATE");
+        MusicBroadReceiver musicBroadReceiver=new MusicBroadReceiver();
+        registerReceiver(musicBroadReceiver, intentFilter);
     }
 
     private void initSongFunction() {
@@ -90,7 +92,7 @@ public class MusicActivity extends AppCompatActivity {
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            musicPlay.startMusic(songItem);
+                            musicPlay.startMusic(songItemList.get(number));
                             startProgress();
                         }
                     });
@@ -109,10 +111,16 @@ public class MusicActivity extends AppCompatActivity {
                 mivNextSong.setSelected(true);
                 mivNextSong.setSelected(false);
                 stopProgress();
-                finish();
+                if (number == songItemList.size() - 1) {
+                    number = 0;
+                } else {
+                    number += 1;
+                }
+                updateView();
                 HttpUtil.cachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
+                        MusicService.isStartActivity=false;
                         musicPlay.nextSong();
                     }
                 });
@@ -127,10 +135,16 @@ public class MusicActivity extends AppCompatActivity {
                 mivPreSong.setSelected(true);
                 mivPreSong.setSelected(false);
                 stopProgress();
-                finish();
+                if (number == 0) {
+                    number = songItemList.size() - 1;
+                } else {
+                    number -= 1;
+                }
+                updateView();
                 HttpUtil.cachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
+                        MusicService.isStartActivity=false;
                         musicPlay.preSong();
                     }
                 });
@@ -158,7 +172,6 @@ public class MusicActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "随机播放", Toast.LENGTH_SHORT).show();
                         break;
                 }
-
             }
         });
     }
@@ -174,6 +187,45 @@ public class MusicActivity extends AppCompatActivity {
         mivNextSong = findViewById(R.id.iv_next_song_service);
         mivPreSong = findViewById(R.id.iv_pre_song_service);
         mivPlayMode = findViewById(R.id.iv_play_mode_service);
+    }
+
+    public class MusicBroadReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //播放播放模式,1为列表播放，2为单曲循环，3为随机播放
+            Bundle bundle = intent.getExtras();
+            int playMode = bundle.getInt("playNumber");
+            Log.d("zwyuu",String.valueOf(playMode));
+            if(playMode==1){
+                stopProgress();
+                if (number == songItemList.size() - 1) {
+                    number = 0;
+                } else {
+                    number += 1;
+                }
+                updateView();
+                mPlayImageView.setSelected(true);
+                play = true;
+                startProgress();
+            }else if(playMode==3){
+                number = bundle.getInt("songNumber");
+                MusicService.songNumber=number;
+                Log.d("zwyrrp",String.valueOf(number));
+                updateView();
+                mPlayImageView.setSelected(true);
+                play = true;
+                startProgress();
+            }
+
+        }
+    }
+
+    public void updateView(){
+        //加载歌曲的名字和歌手名字
+        mTextView1.setText(songItemList.get(number).getSongName() + "-");
+        mTextView2.setText(songItemList.get(number).getSingerName());
+        //加载歌曲图片
+        Picasso.with(this).load(songItemList.get(number).getPicUrl()).placeholder(R.drawable.ic_music_start).into(mSongImageView);
     }
 
     private final Runnable r = new Runnable() {
@@ -204,6 +256,12 @@ public class MusicActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             musicPlay = (MusicService.MusicPlay) service;
+            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
             startProgress();
         }
 

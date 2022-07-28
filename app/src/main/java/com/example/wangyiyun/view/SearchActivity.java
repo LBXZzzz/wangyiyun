@@ -50,7 +50,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     ArrayList<SongItem> totalSongItems = new ArrayList<>();
     SearchPresenter searchPresenter;
     //标记低第几页
-    int page = 0;
+    int page = 1;
     private String searchWord;
     private String songUrl;
     //recyclerview的适配器
@@ -83,7 +83,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                     // 判断是否滑动到了最后一个item，并且是向上滑动
                     if (lastItemPosition == (itemCount - 1)) {
                         //加载更多
-                        page += 1;
+                        page += 30;
                         searchPresenter.searchWord(searchWord, page);
                     }
                 }
@@ -116,7 +116,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 mLinearLayout.setVisibility(View.GONE);
                 songItems = new ArrayList<>();
                 totalSongItems = new ArrayList<>();
-                page = 0;
+                page = 1;
                 //点击回车后自动收起键盘
                 InputMethodManager manager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (manager != null)
@@ -145,7 +145,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 public void onClick(View v) {
                     mLinearLayout.setVisibility(View.GONE);
                     mProgressBar.setVisibility(View.VISIBLE);
-                    page = 0;
+                    page = 1;
                     songItems = new ArrayList<>();
                     totalSongItems = new ArrayList<>();
                     searchWord = bt.getText().toString();
@@ -166,7 +166,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         mProgressBar.setVisibility(View.GONE);
         mLinearLayout1.setVisibility(View.GONE);
         mLinearLayout2.setVisibility(View.VISIBLE);
-        if (page == 0) {
+        if (page == 1) {
             mLinearLayout.setVisibility(View.GONE);
             searchRecyclerViewAdapter = new SearchRecyclerViewAdapter(getApplicationContext(), songItems);
             mRecyclerView.setAdapter(searchRecyclerViewAdapter);
@@ -182,8 +182,9 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 String picUrl = totalSongItems.get(position).getPicUrl();
                 com.example.musicmelody.SongItem songItem = new com.example.musicmelody.SongItem(singerName, songName, songId, picUrl);
                 MainActivity.songList.add(songItem);
-                MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size() - 1));
+                MusicService.isStartActivity=true;
                 MusicService.songNumber = MainActivity.songList.size() - 1;
+                MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size() - 1));
                 MainActivity.mivMusicPlay.setSelected(true);
                 MainActivity.play = true;
             }

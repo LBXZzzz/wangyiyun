@@ -58,7 +58,7 @@ public class GetHotWord implements ContactClass.IGetHotWord {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
-                list = ListChangeUtil.castList(msg.obj, HotSearchItem.class);
+                list=(List<HotSearchItem>)msg.obj;
                 iDataList.dataReturn(list);
             }
         };
