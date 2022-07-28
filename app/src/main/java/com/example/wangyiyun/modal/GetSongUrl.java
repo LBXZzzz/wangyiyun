@@ -18,8 +18,9 @@ import java.util.ArrayList;
 
 public class GetSongUrl implements ContactClass.IGetSongUrl {
     private Handler handler;
-    private void returnData(String url){
-        HttpUtil.cachedThreadPool.execute(()->{
+
+    private void returnData(String url) {
+        HttpUtil.cachedThreadPool.execute(() -> {
             try {
                 analyzeData(HttpUtil.get(url));
             } catch (Throwable e) {
@@ -29,23 +30,23 @@ public class GetSongUrl implements ContactClass.IGetSongUrl {
     }
 
     private void analyzeData(String s) throws JSONException {
-        JSONObject jsonObject=new JSONObject(s);
-        JSONArray jsonArray= jsonObject.optJSONArray("data");
-        JSONObject jsonObject1=jsonArray.getJSONObject(0);
-        String songUrl=jsonObject1.getString("url");
-        Message message=new Message();
-        message.obj=songUrl;
+        JSONObject jsonObject = new JSONObject(s);
+        JSONArray jsonArray = jsonObject.optJSONArray("data");
+        JSONObject jsonObject1 = jsonArray.getJSONObject(0);
+        String songUrl = jsonObject1.getString("url");
+        Message message = new Message();
+        message.obj = songUrl;
         handler.sendMessage(message);
     }
 
     @Override
     public void getSongUrl(String songId, ContactClass.IDataString iDataString) {
-        String url="https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/song/url?id="+songId;
+        String url = "https://netease-cloud-music-api-4eodv9lwk-tangan91314.vercel.app/song/url?id=" + songId;
         returnData(url);
-        handler=new Handler(Looper.getMainLooper()){
+        handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                String songUrl=(String) msg.obj;
+                String songUrl = (String) msg.obj;
                 iDataString.dataReturn(songUrl);
                 super.handleMessage(msg);
             }

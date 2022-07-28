@@ -44,27 +44,28 @@ public class UserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if(rootView==null){
-            rootView =inflater.inflate(R.layout.fragment_user, container, false);
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.fragment_user, container, false);
         }
         initWidgets();
         mibLoader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(getContext(), LoginActivity.class);//给后面开启的活动传值
+                Intent intent = new Intent(getContext(), LoginActivity.class);//给后面开启的活动传值
                 startActivity(intent);
                 //getActivity().finish();
             }
         });
         return rootView;
     }
-    private void initWidgets(){
+
+    private void initWidgets() {
         mLly1 = rootView.findViewById(R.id.lly1);
         GradientDrawable gradientDrawable1 = new GradientDrawable();
         gradientDrawable1.setShape(GradientDrawable.RECTANGLE);
         gradientDrawable1.setCornerRadius(20);
         gradientDrawable1.setColor(getResources().getColor(R.color.gray));
         mLly1.setBackground(gradientDrawable1);
-        mibLoader=rootView.findViewById(R.id.user_profile_photo);
+        mibLoader = rootView.findViewById(R.id.user_profile_photo);
     }
 }

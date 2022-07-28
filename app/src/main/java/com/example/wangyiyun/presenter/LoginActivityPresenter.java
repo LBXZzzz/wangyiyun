@@ -5,8 +5,9 @@ import com.example.wangyiyun.modal.GetPhoneNumber;
 
 public class LoginActivityPresenter implements ContactClass.ILoginPresenter {
     GetPhoneNumber getPhoneNumber;
-    public LoginActivityPresenter(){
-        getPhoneNumber=new GetPhoneNumber();
+
+    public LoginActivityPresenter() {
+        getPhoneNumber = new GetPhoneNumber();
     }
 
     @Override

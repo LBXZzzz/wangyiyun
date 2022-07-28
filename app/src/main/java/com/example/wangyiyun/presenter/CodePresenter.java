@@ -4,10 +4,12 @@ import com.example.wangyiyun.modal.GetPhoneCode;
 
 public class CodePresenter {
     GetPhoneCode getPhoneCode;
-    public CodePresenter(){
-        getPhoneCode=new GetPhoneCode();
+
+    public CodePresenter() {
+        getPhoneCode = new GetPhoneCode();
     }
-    public void getPhoneCode(String phoneNumber,String code){
-        getPhoneCode.loginCode(phoneNumber,code);
+
+    public void getPhoneCode(String phoneNumber, String code) {
+        getPhoneCode.loginCode(phoneNumber, code);
     }
 }

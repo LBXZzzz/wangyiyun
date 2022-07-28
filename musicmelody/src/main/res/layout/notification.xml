@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content">
                     <ImageView
                         android:id="@+id/iv_notification_pre_song_service"
-                        android:layout_width="28dp"
+                        android:layout_width="38dp"
                         android:layout_height="28dp"
                         android:src="@drawable/ic_previous__song"
                         android:background="@drawable/linearlayout_water_selector"/>
@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content">
                     <ImageView
                         android:id="@+id/iv_notification_music_play_service"
-                        android:layout_width="28dp"
+                        android:layout_width="38dp"
                         android:layout_height="28dp"
                         android:src="@drawable/music_play"
                         android:background="@drawable/linearlayout_water_selector"/>
@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content">
                     <ImageView
                         android:id="@+id/iv_notification_next_song_service"
-                        android:layout_width="28dp"
+                        android:layout_width="38dp"
                         android:layout_height="28dp"
                         android:src="@drawable/ic_next_song"
                         android:background="@drawable/linearlayout_water_selector"/>

@@ -23,36 +23,39 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private List<SongItem> songItemArrayList;
     private Context mContext;
 
-    public SearchRecyclerViewAdapter(Context context,List<SongItem> songItemArrayList){
-        this.songItemArrayList=songItemArrayList;
-        this.mContext=context;
+    public SearchRecyclerViewAdapter(Context context, List<SongItem> songItemArrayList) {
+        this.songItemArrayList = songItemArrayList;
+        this.mContext = context;
     }
+
     private ContactClass.OnItemClickListener mOnItemClickListener;
 
-    public void setOnItemClickListener(ContactClass.OnItemClickListener mOnItemClickListener){
-        this.mOnItemClickListener=mOnItemClickListener;
+    public void setOnItemClickListener(ContactClass.OnItemClickListener mOnItemClickListener) {
+        this.mOnItemClickListener = mOnItemClickListener;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         TextView textView1;
         ImageView imageView;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView=itemView.findViewById(R.id.tv_song_name);
-            textView1=itemView.findViewById(R.id.tv_singer_name);
-            imageView=itemView.findViewById(R.id.iv_music_photo);
+            textView = itemView.findViewById(R.id.tv_song_name);
+            textView1 = itemView.findViewById(R.id.tv_singer_name);
+            imageView = itemView.findViewById(R.id.iv_music_photo);
         }
     }
 
-    public class FooterHolder extends RecyclerView.ViewHolder{
+    public class FooterHolder extends RecyclerView.ViewHolder {
         TextView footerText;
         ProgressBar progressBar;
+
         public FooterHolder(@NonNull View itemView) {
             super(itemView);
-            footerText=itemView.findViewById(R.id.tv_footer);
-            progressBar=itemView.findViewById(R.id.pb_footer);
-            if (songItemArrayList.size()<30){
+            footerText = itemView.findViewById(R.id.tv_footer);
+            progressBar = itemView.findViewById(R.id.pb_footer);
+            if (songItemArrayList.size() < 30) {
                 progressBar.setVisibility(View.GONE);
                 footerText.setText("已经到底了喔~~");
             }
@@ -61,19 +64,19 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(holder instanceof SearchRecyclerViewAdapter.ViewHolder){
-            SongItem songItem=songItemArrayList.get(position);
-            (((ViewHolder)holder).textView).setText(songItem.getSongName());
-            (((ViewHolder)holder).textView1).setText(songItem.getSingerName());
+        if (holder instanceof SearchRecyclerViewAdapter.ViewHolder) {
+            SongItem songItem = songItemArrayList.get(position);
+            (((ViewHolder) holder).textView).setText(songItem.getSongName());
+            (((ViewHolder) holder).textView1).setText(songItem.getSingerName());
             Picasso.with(mContext)
-                    .load(songItem.getPicUrl()+"?param=150y150")
-                    .resize(150,150)
+                    .load(songItem.getPicUrl() + "?param=150y150")
+                    .resize(150, 150)
                     .placeholder(R.drawable.ic_android_black_24dp)
                     .into(((ViewHolder) holder).imageView);
         }
-        if(mOnItemClickListener!=null){
+        if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener(v -> {
-                int position1 =holder.getLayoutPosition();
+                int position1 = holder.getLayoutPosition();
                 mOnItemClickListener.onItemClick(holder.itemView, position1);
             });
         }
@@ -94,7 +97,7 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == 0) {
             //你的item
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_item_search,parent,false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_item_search, parent, false);
             return new ViewHolder(view);
         } else {
             //底部“加载更多”item
@@ -104,13 +107,12 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     }
 
 
-
     @Override
     public int getItemCount() {
-        return songItemArrayList.size()+1;
+        return songItemArrayList.size() + 1;
     }
 
-    public void updateData(List<SongItem> list){
+    public void updateData(List<SongItem> list) {
         //再此处理获得的数据  list为传进来的数据
         //... list传进来的数据 添加到mList中
         songItemArrayList.addAll(list);

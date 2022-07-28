@@ -15,6 +15,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HttpUtil {
+    public static final String HttpString="https://netease-cloud-music-api-gan.vercel.app";
     public  static  ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
     //网络获取的post方法
     public static String post(String Url, RequestBody requestBody){

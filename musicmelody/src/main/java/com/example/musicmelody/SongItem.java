@@ -8,11 +8,11 @@ public class SongItem implements Serializable {
     private String songId;
     private String picUrl;
 
-    public SongItem(String singerName, String songName, String songId, String picUrl){
-        this.singerName=singerName;
-        this.songName=songName;
-        this.songId=songId;
-        this.picUrl=picUrl;
+    public SongItem(String singerName, String songName, String songId, String picUrl) {
+        this.singerName = singerName;
+        this.songName = songName;
+        this.songId = songId;
+        this.picUrl = picUrl;
     }
 
     public String getPicUrl() {

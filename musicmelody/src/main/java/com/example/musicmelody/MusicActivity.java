@@ -20,36 +20,36 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 public class MusicActivity extends AppCompatActivity {
-    private ImageView mSongImageView,mPlayImageView;
-    private TextView mTextView1,mTextView2;
+    private ImageView mSongImageView, mPlayImageView;
+    private TextView mTextView1, mTextView2;
     private Toolbar mToolbar;
     private SeekBar mSeekBar;
     private MusicService.MusicPlay musicPlay;
-    private ImageView mivNextSong,mivPreSong,mivPlayMode;
+    private ImageView mivNextSong, mivPreSong, mivPlayMode;
     private SongItem songItem;
-    boolean isTime=false;
+    boolean isTime = false;
     //判断歌曲是否有在播放
-    static boolean play=false;
+    static boolean play = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music);
         //设置状态栏的背景颜色和字体颜色
-        getWindow().setStatusBarColor(Color.rgb(255,255,255));
+        getWindow().setStatusBarColor(Color.rgb(255, 255, 255));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        Intent bindIntent=new Intent(this,MusicService.class);
-        bindService(bindIntent,connection,BIND_AUTO_CREATE);
+        Intent bindIntent = new Intent(this, MusicService.class);
+        bindService(bindIntent, connection, BIND_AUTO_CREATE);
         //初始化控件
         initControl();
         //接收歌曲信息
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        songItem= (SongItem) bundle.getSerializable("SongList");
-        int playMode=bundle.getInt("playMode");
-        Log.d("zwui",String.valueOf(playMode));
+        songItem = (SongItem) bundle.getSerializable("SongList");
+        int playMode = bundle.getInt("playMode");
+        Log.d("zwui", String.valueOf(playMode));
         //播放播放模式,1为列表播放，2为单循环，3为随机播放
-        switch(playMode){
+        switch (playMode) {
             case 1:
                 mivPlayMode.setImageResource(R.drawable.ic_list_play);
                 break;
@@ -61,7 +61,7 @@ public class MusicActivity extends AppCompatActivity {
                 break;
         }
         //加载歌曲的名字和歌手名字
-        mTextView1.setText(songItem.getSongName()+"-");
+        mTextView1.setText(songItem.getSongName() + "-");
         mTextView2.setText(songItem.getSingerName());
         //加载歌曲图片
         Log.d("现在的线程为：", Thread.currentThread().getName());
@@ -83,10 +83,10 @@ public class MusicActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 musicPlay.playMode();
-                if(!play){
+                if (!play) {
                     //写音乐播放事件
                     mPlayImageView.setSelected(true);
-                    play=true;
+                    play = true;
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -94,10 +94,10 @@ public class MusicActivity extends AppCompatActivity {
                             startProgress();
                         }
                     });
-                }else {
+                } else {
                     //音乐暂停
                     mPlayImageView.setSelected(false);
-                    play=false;
+                    play = false;
                     musicPlay.stopMusic();
                     stopProgress();
                 }
@@ -117,7 +117,7 @@ public class MusicActivity extends AppCompatActivity {
                     }
                 });
                 mPlayImageView.setSelected(true);
-                play=true;
+                play = true;
                 startProgress();
             }
         });
@@ -135,7 +135,7 @@ public class MusicActivity extends AppCompatActivity {
                     }
                 });
                 mPlayImageView.setSelected(true);
-                play=true;
+                play = true;
                 startProgress();
             }
         });
@@ -143,8 +143,8 @@ public class MusicActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //播放播放模式,1为列表播放，2为单循环，3为随机播放
-                int playInt=musicPlay.playMode();
-                switch(playInt){
+                int playInt = musicPlay.playMode();
+                switch (playInt) {
                     case 1:
                         mivPlayMode.setImageResource(R.drawable.ic_list_play);
                         Toast.makeText(getApplicationContext(), "列表播放", Toast.LENGTH_SHORT).show();
@@ -164,46 +164,46 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     private void initControl() {
-        mSeekBar=findViewById(R.id.seekbar_service);
-        mSongImageView=findViewById(R.id.iv_music_photo_service);
-        mPlayImageView=findViewById(R.id.iv_music_play_service);
-        mToolbar=findViewById(R.id.too_bar_service);
-        mTextView1=findViewById(R.id.tv1_toolbar);
-        mTextView2=findViewById(R.id.tv2_toolbar);
-        mSeekBar=findViewById(R.id.seekbar_service);
-        mivNextSong=findViewById(R.id.iv_next_song_service);
-        mivPreSong=findViewById(R.id.iv_pre_song_service);
-        mivPlayMode=findViewById(R.id.iv_play_mode_service);
+        mSeekBar = findViewById(R.id.seekbar_service);
+        mSongImageView = findViewById(R.id.iv_music_photo_service);
+        mPlayImageView = findViewById(R.id.iv_music_play_service);
+        mToolbar = findViewById(R.id.too_bar_service);
+        mTextView1 = findViewById(R.id.tv1_toolbar);
+        mTextView2 = findViewById(R.id.tv2_toolbar);
+        mSeekBar = findViewById(R.id.seekbar_service);
+        mivNextSong = findViewById(R.id.iv_next_song_service);
+        mivPreSong = findViewById(R.id.iv_pre_song_service);
+        mivPlayMode = findViewById(R.id.iv_play_mode_service);
     }
 
     private final Runnable r = new Runnable() {
         @Override
         public void run() {
-            while (isTime){
-                    try {
-                        mSeekBar.setMax(musicPlay.getMusicTotalTime());
-                        Thread.sleep(70);
-                        mSeekBar.setProgress(musicPlay.getMusicCurrentTime());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            while (isTime) {
+                try {
+                    mSeekBar.setMax(musicPlay.getMusicTotalTime());
+                    Thread.sleep(70);
+                    mSeekBar.setProgress(musicPlay.getMusicCurrentTime());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
 
-    private void startProgress(){
+    private void startProgress() {
         isTime = true;
         HttpUtil.cachedThreadPool.execute(r);
     }
 
-    private void stopProgress(){
+    private void stopProgress() {
         isTime = false;
     }
 
-    private ServiceConnection connection=new ServiceConnection() {
+    private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            musicPlay=(MusicService.MusicPlay)service;
+            musicPlay = (MusicService.MusicPlay) service;
             startProgress();
         }
 

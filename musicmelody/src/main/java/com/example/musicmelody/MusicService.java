@@ -37,7 +37,8 @@ public class MusicService extends Service {
     public static List<SongItem> songItemList = new ArrayList<>();
     private final MusicPlay musicPlay = new MusicPlay(songItemList);
     public static int songNumber = 0;
-
+    //存随机播放的歌曲信息
+    private static List<SongItem> songItemListRandom = new ArrayList<>();
     RemoteViews remoteViews;
     NotificationManager notificationManager;
     Notification notification;
@@ -94,7 +95,7 @@ public class MusicService extends Service {
     }
 
 
-    public class MusicPlay extends Binder implements IMusic,MediaPlayer.OnCompletionListener,MediaPlayer.OnErrorListener {
+    public class MusicPlay extends Binder implements IMusic, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
         private final MediaPlayer mediaPlayer = new MediaPlayer();
         //判断有没有MediaPlayer准备过,true为没准备过
         private volatile boolean isPlay = true;
@@ -103,12 +104,10 @@ public class MusicService extends Service {
         //记录歌曲播放到第几首
         //存储播放列表的集合
         private List<SongItem> songList;
-        //存随机播放的歌曲信息
-        private List<SongItem> songItemListRandom = new ArrayList<>();
         //播放播放模式,1为列表播放，2为单循环，3为随机播放
-        private int playPattern=1;
+        private int playPattern = 1;
         //判断是否准备好了,0是准备好了，1是未准备好
-        private boolean isPreSee=false;
+        private boolean isPreSee = false;
 
         public MusicPlay(List<SongItem> songList) {
             this.songList = songList;
@@ -117,8 +116,8 @@ public class MusicService extends Service {
         @Override
         public void startMusic(SongItem songItem) {
             if (isPlay) {
-                Log.d("zwyupu",String.valueOf(songList.size()));
-                isPreSee=false;
+                Log.d("zwyupu", songItem.getSongName());
+                isPreSee = false;
                 mediaPlayer.setOnCompletionListener(this);
                 mediaPlayer.setOnErrorListener(this);
                 String musicId = songItem.getSongId();
@@ -127,7 +126,7 @@ public class MusicService extends Service {
                 //更新通知
                 remoteViews.setTextViewText(R.id.tv_notification_song_name, songItem.getSongName());
                 remoteViews.setTextViewText(R.id.tv_notification_singer_name, songItem.getSingerName());
-                handler=new Handler(Looper.getMainLooper()){
+                handler = new Handler(Looper.getMainLooper()) {
                     @Override
                     public void handleMessage(@NonNull Message msg) {
                         String photoUrl = (String) msg.obj;
@@ -135,7 +134,7 @@ public class MusicService extends Service {
                     }
                 };
                 Message message = new Message();
-                message.obj = songItem.getPicUrl()+ "?param=200y200";
+                message.obj = songItem.getPicUrl() + "?param=200y200";
                 handler.sendMessage(message);
                 notificationManager.notify(1, notification);
                 returnData(url);
@@ -143,10 +142,10 @@ public class MusicService extends Service {
                     Looper.prepare();
                 }
                 Looper looper = Looper.myLooper();
-                Intent intent = new Intent(MusicService.this,MusicActivity.class);
+                Intent intent = new Intent(MusicService.this, MusicActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("SongList", songItem);
-                bundle.putInt("playMode",playPattern);
+                bundle.putInt("playMode", playPattern);
                 intent.putExtras(bundle);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -176,7 +175,7 @@ public class MusicService extends Service {
                         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                             @Override
                             public void onPrepared(MediaPlayer mp) {
-                                isPreSee=true;
+                                isPreSee = true;
                                 mediaPlayer.start();
                             }
                         });
@@ -214,11 +213,11 @@ public class MusicService extends Service {
 
         @Override
         public void stopMusic() {
-                try {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
-                    }
-                } catch (Exception ignore) {
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                }
+            } catch (Exception ignore) {
             }
         }
 
@@ -289,16 +288,16 @@ public class MusicService extends Service {
         @Override
         public int playMode() {
             //播放播放模式,1为列表播放，2为单循环，3为随机播放
-            if(playPattern==1){
-                playPattern=2;
+            if (playPattern == 1) {
+                playPattern = 2;
                 return playPattern;
             }
-            if(playPattern==2){
-                playPattern=3;
+            if (playPattern == 2) {
+                playPattern = 3;
                 return playPattern;
             }
-            if(playPattern==3){
-                playPattern=1;
+            if (playPattern == 3) {
+                playPattern = 1;
                 return playPattern;
             }
             return playPattern;
@@ -306,29 +305,27 @@ public class MusicService extends Service {
 
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Log.d("zwu",String.valueOf(playPattern));
-            if (playPattern==1){
+            if (playPattern == 1) {
                 nextSong();
-            }else if(playPattern==2){
+            } else if (playPattern == 2) {
                 startMusic(songList.get(songNumber));
-            }else if(playPattern==3){
-                Log.d("zwyu【u",String.valueOf(songList.size()));
-                if(songItemListRandom.size()==0){
-                    Log.d("zwyrr","}}}}}}");
+            } else if (playPattern == 3) {
+                if (songItemListRandom.size() == 0) {
                     songItemListRandom.addAll(songList);
                 }
                 songItemListRandom.remove(songNumber);
-                Random random=new Random();
-                Log.d("zwyu【u",String.valueOf(songList.size()));
-                Log.d("zwyuu",String.valueOf(songItemListRandom.size()));
-                int x=0;
-                if(songItemListRandom.size()==1){
-                    x=0;
-                }else {
-                    x=random.nextInt(songItemListRandom.size());
+                if (songItemListRandom.size() == 0) {
+                    songItemListRandom.addAll(songList);
                 }
-                SongItem songItemRandom=songItemListRandom.get(x);
-                Log.d("zwpe",songItemRandom.getSongName());
+                Random random = new Random();
+                int x;
+                if (songItemListRandom.size() == 1) {
+                    x = 0;
+                } else {
+                    x = random.nextInt(songItemListRandom.size());
+                }
+                SongItem songItemRandom = songItemListRandom.get(x);
+                isPlay = true;
                 startMusic(songItemRandom);
                 songItemListRandom.remove(x);
             }

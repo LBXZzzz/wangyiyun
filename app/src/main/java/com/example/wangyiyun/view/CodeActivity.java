@@ -25,19 +25,19 @@ public class CodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_code);
-        Intent intent=getIntent();
-        String phoneNumber=intent.getStringExtra("PhoneNumber");
-        mEditText=findViewById(R.id.et_code);
-        mButton=findViewById(R.id.bt_login_code);
+        Intent intent = getIntent();
+        String phoneNumber = intent.getStringExtra("PhoneNumber");
+        mEditText = findViewById(R.id.et_code);
+        mButton = findViewById(R.id.bt_login_code);
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String code=mEditText.getText().toString();
-                if(code.length()==4){
-                    codePresenter=new CodePresenter();
-                    codePresenter.getPhoneCode(phoneNumber,code);
-                }else {
-                    Toast.makeText(CodeActivity.this,"请输入四位验证码",Toast.LENGTH_SHORT).show();
+                String code = mEditText.getText().toString();
+                if (code.length() == 4) {
+                    codePresenter = new CodePresenter();
+                    codePresenter.getPhoneCode(phoneNumber, code);
+                } else {
+                    Toast.makeText(CodeActivity.this, "请输入四位验证码", Toast.LENGTH_SHORT).show();
                 }
             }
         });
