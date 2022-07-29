@@ -40,20 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static boolean play = false;
     static List<SongItem> songList = new ArrayList<>();
     static MusicService.MusicPlay musicPlay;
-    private final Runnable r = new Runnable() {
-        @Override
-        public void run() {
-            while (isTime) {
-                try {
-                    seekBar.setMax(musicPlay.getMusicTotalTime());
-                    Thread.sleep(70);
-                    seekBar.setProgress(musicPlay.getMusicCurrentTime());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,69 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = findViewById(R.id.main_too_bar);
         ibNextSong = findViewById(R.id.ib_next_song);
         ibPreSong = findViewById(R.id.ib_pre_song);
-        /*ibNextSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopProgress();
-                HttpUtil.cachedThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        musicPlay.nextSong();
-                    }
-                });
-                mivMusicPlay.setSelected(true);
-                play=true;
-                startProgress();
-            }
-        });
-        ibPreSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopProgress();
-                HttpUtil.cachedThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        musicPlay.preSong();
-                    }
-                });
-                mivMusicPlay.setSelected(true);
-                play=true;
-                startProgress();
-            }
-        });
-        mivMusicPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!play){
-                    //写音乐播放事件
-                    mivMusicPlay.setSelected(true);
-                    play=true;
-                    HttpUtil.cachedThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            musicPlay.startMusic(songItem);
-;                           startProgress();
-                        }
-                    });
-                }else {
-                    //音乐暂停
-                    mivMusicPlay.setSelected(false);
-                    play=false;
-                    Log.d("现在的线程为：", Thread.currentThread().getName());
-                    musicPlay.stopMusic();
-                    stopProgress();
-                }
-            }
-        });*/
-    }
-
-    private void startProgress() {
-        isTime = true;
-        HttpUtil.cachedThreadPool.execute(r);
-    }
-
-    private void stopProgress() {
-        isTime = false;
     }
 
     private void initPaper() {

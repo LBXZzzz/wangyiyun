@@ -6,10 +6,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
+import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -55,6 +60,8 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
     private String songUrl;
     //recyclerview的适配器
     private SearchRecyclerViewAdapter searchRecyclerViewAdapter;
+    MusicService.MusicPlay musicPlay;
+    MusicService musicService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +69,15 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         setContentView(R.layout.activity_search);
         getWindow().setStatusBarColor(Color.rgb(255, 255, 255));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
+        //绑定服务
+        //判断当前版本是否支持前台服务，不支持则开启后台服务
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(getApplicationContext(), MusicService.class));
+        } else {
+            startService(new Intent(getApplicationContext(), MusicService.class));
+        }
+        Intent bindIntent = new Intent(this, MusicService.class);
+        bindService(bindIntent, connection, BIND_AUTO_CREATE);
         searchPresenter = new SearchPresenter(this, this, this);
         initControl();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -181,15 +197,26 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
                 String songId = totalSongItems.get(position).getSongId();
                 String picUrl = totalSongItems.get(position).getPicUrl();
                 com.example.musicmelody.SongItem songItem = new com.example.musicmelody.SongItem(singerName, songName, songId, picUrl);
-                MainActivity.songList.add(songItem);
+                MusicService.songItemList.add(songItem);
                 MusicService.isStartActivity=true;
-                MusicService.songNumber = MainActivity.songList.size() - 1;
-                MainActivity.musicPlay.openMusic(MainActivity.songList.get(MainActivity.songList.size() - 1));
-                MainActivity.mivMusicPlay.setSelected(true);
-                MainActivity.play = true;
+                MusicService.songNumber = MusicService.songItemList.size()-1;
+                musicService.openMusic(MusicService.songItemList.get(MusicService.songNumber));
             }
         });
     }
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            musicPlay = (MusicService.MusicPlay) service;
+            musicService=musicPlay.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     @Override
     public void getData(String dataString, String dataString2) {

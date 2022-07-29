@@ -39,6 +39,7 @@ public class MusicActivity extends AppCompatActivity {
     //
     List<SongItem> songItemList = new ArrayList<>();
     int number;
+    MusicService musicService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +76,7 @@ public class MusicActivity extends AppCompatActivity {
         initSongFunction();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("UPDATE");
-        MusicBroadReceiver musicBroadReceiver=new MusicBroadReceiver();
+        MusicBroadReceiver musicBroadReceiver = new MusicBroadReceiver();
         registerReceiver(musicBroadReceiver, intentFilter);
     }
 
@@ -84,7 +85,7 @@ public class MusicActivity extends AppCompatActivity {
         mPlayImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                musicPlay.playMode();
+                musicService.playMode();
                 if (!play) {
                     //写音乐播放事件
                     mPlayImageView.setSelected(true);
@@ -92,7 +93,7 @@ public class MusicActivity extends AppCompatActivity {
                     HttpUtil.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            musicPlay.startMusic(songItemList.get(number));
+                            musicService.startMusic(songItemList.get(number));
                             startProgress();
                         }
                     });
@@ -100,7 +101,7 @@ public class MusicActivity extends AppCompatActivity {
                     //音乐暂停
                     mPlayImageView.setSelected(false);
                     play = false;
-                    musicPlay.stopMusic();
+                    musicService.stopMusic();
                     stopProgress();
                 }
             }
@@ -120,8 +121,8 @@ public class MusicActivity extends AppCompatActivity {
                 HttpUtil.cachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
-                        MusicService.isStartActivity=false;
-                        musicPlay.nextSong();
+                        MusicService.isStartActivity = false;
+                        musicService.nextSong();
                     }
                 });
                 mPlayImageView.setSelected(true);
@@ -144,8 +145,8 @@ public class MusicActivity extends AppCompatActivity {
                 HttpUtil.cachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
-                        MusicService.isStartActivity=false;
-                        musicPlay.preSong();
+                        MusicService.isStartActivity = false;
+                        musicService.preSong();
                     }
                 });
                 mPlayImageView.setSelected(true);
@@ -157,7 +158,7 @@ public class MusicActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //播放播放模式,1为列表播放，2为单循环，3为随机播放
-                int playInt = musicPlay.playMode();
+                int playInt =musicService.playMode();
                 switch (playInt) {
                     case 1:
                         mivPlayMode.setImageResource(R.drawable.ic_list_play);
@@ -195,8 +196,7 @@ public class MusicActivity extends AppCompatActivity {
             //播放播放模式,1为列表播放，2为单曲循环，3为随机播放
             Bundle bundle = intent.getExtras();
             int playMode = bundle.getInt("playNumber");
-            Log.d("zwyuu",String.valueOf(playMode));
-            if(playMode==1){
+            if (playMode == 1) {
                 stopProgress();
                 if (number == songItemList.size() - 1) {
                     number = 0;
@@ -207,10 +207,9 @@ public class MusicActivity extends AppCompatActivity {
                 mPlayImageView.setSelected(true);
                 play = true;
                 startProgress();
-            }else if(playMode==3){
+            } else if (playMode == 3) {
                 number = bundle.getInt("songNumber");
-                MusicService.songNumber=number;
-                Log.d("zwyrrp",String.valueOf(number));
+                MusicService.songNumber = number;
                 updateView();
                 mPlayImageView.setSelected(true);
                 play = true;
@@ -220,7 +219,7 @@ public class MusicActivity extends AppCompatActivity {
         }
     }
 
-    public void updateView(){
+    public void updateView() {
         //加载歌曲的名字和歌手名字
         mTextView1.setText(songItemList.get(number).getSongName() + "-");
         mTextView2.setText(songItemList.get(number).getSingerName());
@@ -233,9 +232,9 @@ public class MusicActivity extends AppCompatActivity {
         public void run() {
             while (isTime) {
                 try {
-                    mSeekBar.setMax(musicPlay.getMusicTotalTime());
+                    mSeekBar.setMax(musicService.getMusicTotalTime());
                     Thread.sleep(70);
-                    mSeekBar.setProgress(musicPlay.getMusicCurrentTime());
+                    mSeekBar.setProgress(musicService.getMusicCurrentTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -256,6 +255,7 @@ public class MusicActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             musicPlay = (MusicService.MusicPlay) service;
+            musicService=musicPlay.getService();
             mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
