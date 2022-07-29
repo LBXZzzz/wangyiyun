@@ -215,6 +215,20 @@ public class MusicActivity extends AppCompatActivity {
                 play = true;
                 startProgress();
             }
+            String s=bundle.getString("PLAY");
+            Log.d("zwyjjj",s+"  ");
+            switch (s){
+                case "START_MUSIC":
+                    mPlayImageView.setSelected(true);
+                    play = true;
+                    startProgress();
+                    break;
+                case "PAUSE_MUSIC":
+                    mPlayImageView.setSelected(false);
+                    play=false;
+                    stopProgress();
+                    break;
+            }
 
         }
     }

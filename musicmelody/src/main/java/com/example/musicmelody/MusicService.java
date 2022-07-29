@@ -145,6 +145,12 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                     PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
                     remoteViews.setOnClickPendingIntent(R.id.iv_notification_music_play_service, pending);
                     notificationManager.notify(1, notification);
+                    Intent intent2 = new Intent();
+                    intent2.setAction("UPDATE");
+                    Bundle bundle = new Bundle();
+                    bundle.putString("PLAY", "START_MUSIC");
+                    intent2.putExtras(bundle);
+                    sendBroadcast(intent2);
                     startMusic(null);
                     break;
                 case BROAD_RECEIVER_NEXT:
@@ -160,6 +166,12 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                     pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
                     remoteViews.setOnClickPendingIntent(R.id.iv_notification_music_play_service, pending);
                     notificationManager.notify(1, notification);
+                    Intent intent3 = new Intent();
+                    intent3.setAction("UPDATE");
+                    Bundle bundle1 = new Bundle();
+                    bundle1.putString("PLAY", "PAUSE_MUSIC");
+                    intent3.putExtras(bundle1);
+                    sendBroadcast(intent3);
                     stopMusic();
                     break;
             }
@@ -374,7 +386,6 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d("zwyuuuuu",String.valueOf(playPattern));
         Intent intent = new Intent();
         intent.setAction("UPDATE");
         Bundle bundle = new Bundle();
@@ -389,8 +400,6 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         } else if (playPattern == 2) {
             startMusic(songItemList.get(songNumber));
         } else if (playPattern == 3) {
-            Log.d("zwyuuiiu",String.valueOf(randomPlay));
-            Log.d("zwyuuiiu",String.valueOf(songItemList.size()));
             if((randomPlay==songItemList.size())||isRandom){
                 randomPlayList=new ArrayList<>();
                 for (int i = 0; i <songItemList.size() ; i++) {
@@ -404,7 +413,6 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                     y=random.nextInt(songItemList.size());
                     Collections.swap(randomPlayList,x,y);
                 }
-                System.out.println("zwyulist"+randomPlayList);
                 randomPlay=0;
                 isRandom=false;
             }
@@ -412,7 +420,6 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
             intent.putExtras(bundle);
             sendBroadcast(intent);
             SongItem songItemRandom = songItemList.get(randomPlayList.get(randomPlay));
-            Log.d("zwyugggu",String.valueOf(randomPlayList.get(randomPlay)));
             randomPlay++;
             isPlay = true;
             startMusic(songItemRandom);
