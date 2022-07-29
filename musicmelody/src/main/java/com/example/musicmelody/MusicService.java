@@ -374,6 +374,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        Log.d("zwyuuuuu",String.valueOf(playPattern));
         Intent intent = new Intent();
         intent.setAction("UPDATE");
         Bundle bundle = new Bundle();
@@ -388,7 +389,9 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         } else if (playPattern == 2) {
             startMusic(songItemList.get(songNumber));
         } else if (playPattern == 3) {
-            if((randomPlay==randomPlayList.size())||isRandom){
+            Log.d("zwyuuiiu",String.valueOf(randomPlay));
+            Log.d("zwyuuiiu",String.valueOf(songItemList.size()));
+            if((randomPlay==songItemList.size())||isRandom){
                 randomPlayList=new ArrayList<>();
                 for (int i = 0; i <songItemList.size() ; i++) {
                     randomPlayList.add(i);
@@ -409,9 +412,9 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
             intent.putExtras(bundle);
             sendBroadcast(intent);
             SongItem songItemRandom = songItemList.get(randomPlayList.get(randomPlay));
+            Log.d("zwyugggu",String.valueOf(randomPlayList.get(randomPlay)));
             randomPlay++;
             isPlay = true;
-            Log.d("zwyuuuuu",String.valueOf(randomPlayList.get(randomPlay)));
             startMusic(songItemRandom);
         }
     }
