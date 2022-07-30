@@ -196,13 +196,10 @@ public class MusicActivity extends AppCompatActivity {
             //播放播放模式,1为列表播放，2为单曲循环，3为随机播放
             Bundle bundle = intent.getExtras();
             int playMode = bundle.getInt("playNumber");
+            Log.d("zwyhj",String.valueOf(playMode));
             if (playMode == 1) {
                 stopProgress();
-                if (number == songItemList.size() - 1) {
-                    number = 0;
-                } else {
-                    number += 1;
-                }
+                number=MusicService.songNumber;
                 updateView();
                 mPlayImageView.setSelected(true);
                 play = true;
@@ -216,20 +213,42 @@ public class MusicActivity extends AppCompatActivity {
                 startProgress();
             }
             String s=bundle.getString("PLAY");
-            Log.d("zwyjjj",s+"  ");
-            switch (s){
-                case "START_MUSIC":
-                    mPlayImageView.setSelected(true);
-                    play = true;
-                    startProgress();
-                    break;
-                case "PAUSE_MUSIC":
-                    mPlayImageView.setSelected(false);
-                    play=false;
-                    stopProgress();
-                    break;
+            if(s!=null){
+                switch (s){
+                    case "START_MUSIC":
+                        mPlayImageView.setSelected(true);
+                        play = true;
+                        startProgress();
+                        break;
+                    case "PAUSE_MUSIC":
+                        mPlayImageView.setSelected(false);
+                        play=false;
+                        stopProgress();
+                        break;
+                    case "BROAD_RECEIVER_PRE":
+                        if (number == 0) {
+                            number = songItemList.size() - 1;
+                        } else {
+                            number -= 1;
+                        }
+                        updateView();
+                        mPlayImageView.setSelected(true);
+                        play = true;
+                        startProgress();
+                        break;
+                    case "BROAD_RECEIVER_NEXT":
+                        if (number == songItemList.size() - 1) {
+                            number = 0;
+                        } else {
+                            number += 1;
+                        }
+                        updateView();
+                        mPlayImageView.setSelected(true);
+                        play = true;
+                        startProgress();
+                        break;
+                }
             }
-
         }
     }
 

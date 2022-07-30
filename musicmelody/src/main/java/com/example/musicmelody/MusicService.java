@@ -63,6 +63,25 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         remoteViews = new RemoteViews(getPackageName(), R.layout.notification);
         remoteViews.setImageViewResource(R.id.iv_notification_music_photo, R.drawable.ic_music_stop);
         sendDefaultNotification(remoteViews);
+        //更新通知
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BROAD_RECEIVER_ACTION_PLAY);
+        intentFilter.addAction(BROAD_RECEIVER_ACTION_PAUSE);
+        intentFilter.addAction(BROAD_RECEIVER_NEXT);
+        intentFilter.addAction(BROAD_RECEIVER_PRE);
+        BroadReceiver broadReceiver = new BroadReceiver();
+        registerReceiver(broadReceiver, intentFilter);
+        Intent intent1 = new Intent();
+        intent1.setAction(BROAD_RECEIVER_ACTION_PLAY);
+        PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_MUTABLE);
+        remoteViews.setOnClickPendingIntent(R.id.iv_notification_music_play_service, pending);
+        intent1.setAction(BROAD_RECEIVER_NEXT);
+        pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_MUTABLE);
+        remoteViews.setOnClickPendingIntent(R.id.iv_notification_next_song_service, pending);
+        intent1.setAction(BROAD_RECEIVER_PRE);
+        pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_MUTABLE);
+        remoteViews.setOnClickPendingIntent(R.id.iv_notification_pre_song_service, pending);
+        notificationManager.notify(1, notification);
     }
 
     public void sendDefaultNotification(RemoteViews remoteViews) {
@@ -108,10 +127,10 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     //音乐功能
     //常量
-    private static final String BROAD_RECEIVER_ACTION_PAUSE="BROAD_RECEIVER_ACTION_PAUSE";
-    private static final String BROAD_RECEIVER_ACTION_PLAY="BROAD_RECEIVER_ACTION_PLAY";
-    private static final String BROAD_RECEIVER_NEXT="BROAD_RECEIVER_NEXT";
-    private static final String BROAD_RECEIVER_PRE="BROAD_RECEIVER_PRE";
+    private static final String BROAD_RECEIVER_ACTION_PAUSE = "BROAD_RECEIVER_ACTION_PAUSE";
+    private static final String BROAD_RECEIVER_ACTION_PLAY = "BROAD_RECEIVER_ACTION_PLAY";
+    private static final String BROAD_RECEIVER_NEXT = "BROAD_RECEIVER_NEXT";
+    private static final String BROAD_RECEIVER_PRE = "BROAD_RECEIVER_PRE";
 
     private final MediaPlayer mediaPlayer = new MediaPlayer();
     //判断有没有MediaPlayer准备过,true为没准备过
@@ -123,23 +142,22 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
     //播放播放模式,1为列表播放，2为单循环，3为随机播放
     private int playPattern = 1;
     //记录随机播放的列的几首哥
-    private int randomPlay=0;
+    private int randomPlay = 0;
     //判断是否准备好了,0是准备好了，1是未准备好
     private boolean isPreSee = false;
     //判断是否需要重新排列随机播放的列表
-    boolean isRandom=true;
+    boolean isRandom = true;
     //随机播放的列表
-    private ArrayList<Integer> randomPlayList=new ArrayList<>();
+    private ArrayList<Integer> randomPlayList = new ArrayList<>();
 
     public class BroadReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String s=intent.getAction();
-            Log.d("ZWYIII",s);
-            switch (s){
+            String s = intent.getAction();
+            switch (s) {
                 case BROAD_RECEIVER_ACTION_PLAY:
-                    remoteViews.setImageViewResource(R.id.iv_notification_music_play_service,R.drawable.ic_music_start);
+                    remoteViews.setImageViewResource(R.id.iv_notification_music_play_service, R.drawable.ic_music_start);
                     Intent intent1 = new Intent();
                     intent1.setAction(BROAD_RECEIVER_ACTION_PAUSE);
                     PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
@@ -154,13 +172,27 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                     startMusic(null);
                     break;
                 case BROAD_RECEIVER_NEXT:
+                    isStartActivity = false;
+                    intent2 = new Intent();
+                    intent2.setAction("UPDATE");
+                    bundle = new Bundle();
+                    bundle.putString("PLAY", "BROAD_RECEIVER_NEXT");
+                    intent2.putExtras(bundle);
+                    sendBroadcast(intent2);
                     nextSong();
                     break;
                 case BROAD_RECEIVER_PRE:
+                    isStartActivity = false;
+                    intent2 = new Intent();
+                    intent2.setAction("UPDATE");
+                    bundle = new Bundle();
+                    bundle.putString("PLAY", "BROAD_RECEIVER_PRE");
+                    intent2.putExtras(bundle);
+                    sendBroadcast(intent2);
                     preSong();
                     break;
                 case BROAD_RECEIVER_ACTION_PAUSE:
-                    remoteViews.setImageViewResource(R.id.iv_notification_music_play_service,R.drawable.ic_music_stop);
+                    remoteViews.setImageViewResource(R.id.iv_notification_music_play_service, R.drawable.ic_music_stop);
                     intent1 = new Intent();
                     intent1.setAction(BROAD_RECEIVER_ACTION_PLAY);
                     pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
@@ -197,33 +229,15 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                     Picasso.with(getApplicationContext()).load(photoUrl).into(remoteViews, R.id.iv_notification_music_photo, 1, notification);
                 }
             };
-            Message message = new Message();
-            message.obj = songItem.getPicUrl() + "?param=200y200";
-            handler.sendMessage(message);
-            //更新通知
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(BROAD_RECEIVER_ACTION_PLAY);
-            intentFilter.addAction(BROAD_RECEIVER_ACTION_PAUSE);
-            intentFilter.addAction(BROAD_RECEIVER_NEXT);
-            intentFilter.addAction(BROAD_RECEIVER_PRE);
-            BroadReceiver broadReceiver = new BroadReceiver();
-            registerReceiver(broadReceiver, intentFilter);
-            Intent intent1 = new Intent();
-            intent1.setAction(BROAD_RECEIVER_ACTION_PLAY);
-            PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
-            remoteViews.setOnClickPendingIntent(R.id.iv_notification_music_play_service, pending);
-            intent1.setAction(BROAD_RECEIVER_NEXT);
-            pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
-            remoteViews.setOnClickPendingIntent(R.id.iv_notification_next_song_service, pending);
-            intent1.setAction(BROAD_RECEIVER_PRE);
-            pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_IMMUTABLE);
-            remoteViews.setOnClickPendingIntent(R.id.iv_notification_pre_song_service, pending);
             notificationManager.notify(1, notification);
-            returnData(url);
             if (Looper.myLooper() == null) {
                 Looper.prepare();
             }
             Looper looper = Looper.myLooper();
+            Message message = new Message();
+            message.obj = songItem.getPicUrl() + "?param=200y200";
+            handler.sendMessage(message);
+            returnData(url);
             if (isStartActivity) {
                 Intent intent = new Intent(MusicService.this, MusicActivity.class);
                 Bundle bundle = new Bundle();
@@ -236,7 +250,9 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
             handler = new Handler(looper) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
+                    super.handleMessage(msg);
                     String songUrl = (String) msg.obj;
+                    removeMessages(1);
                     try {
                         if (songUrl.equals("null")) {
                             songUrl = songPlayId;
@@ -247,12 +263,15 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                             mediaPlayer.reset();
                         }
                         mediaPlayer.setDataSource(songUrl);//设置音源
-                        mediaPlayer.prepareAsync();
+                        try {
+                            mediaPlayer.prepareAsync();
+                        } catch (IllegalStateException exception) {
+
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     isPlay = false;
-                    super.handleMessage(msg);
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mp) {
@@ -287,6 +306,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         JSONObject jsonObject1 = jsonArray.getJSONObject(0);
         String songUrl = jsonObject1.getString("url");
         Message message = new Message();
+        message.what = 1;
         message.obj = songUrl;
         handler.sendMessage(message);
     }
@@ -391,30 +411,30 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         Bundle bundle = new Bundle();
         bundle.putInt("playNumber", playPattern);
         intent.putExtras(bundle);
+        isStartActivity = false;
         if (playPattern == 1 || playPattern == 2) {
             sendBroadcast(intent);
         }
-        isStartActivity = false;
         if (playPattern == 1) {
             nextSong();
         } else if (playPattern == 2) {
             startMusic(songItemList.get(songNumber));
         } else if (playPattern == 3) {
-            if((randomPlay==songItemList.size())||isRandom){
-                randomPlayList=new ArrayList<>();
-                for (int i = 0; i <songItemList.size() ; i++) {
+            if ((randomPlay == songItemList.size()) || isRandom) {
+                randomPlayList = new ArrayList<>();
+                for (int i = 0; i < songItemList.size(); i++) {
                     randomPlayList.add(i);
                 }
                 int x;
                 int y;
                 Random random = new Random();
                 for (int i = 0; i < 10; i++) {
-                    x=random.nextInt(songItemList.size());
-                    y=random.nextInt(songItemList.size());
-                    Collections.swap(randomPlayList,x,y);
+                    x = random.nextInt(songItemList.size());
+                    y = random.nextInt(songItemList.size());
+                    Collections.swap(randomPlayList, x, y);
                 }
-                randomPlay=0;
-                isRandom=false;
+                randomPlay = 0;
+                isRandom = false;
             }
             bundle.putInt("songNumber", randomPlayList.get(randomPlay));
             intent.putExtras(bundle);
