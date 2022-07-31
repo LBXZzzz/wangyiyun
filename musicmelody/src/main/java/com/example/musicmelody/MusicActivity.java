@@ -33,13 +33,14 @@ public class MusicActivity extends AppCompatActivity {
     private MusicService.MusicPlay musicPlay;
     private ImageView mivNextSong, mivPreSong, mivPlayMode;
     private SongItem songItem;
-    boolean isTime = false;
+    private boolean isTime = false;
     //判断歌曲是否有在播放
-    static boolean play = false;
+    private boolean play = false;
     //
-    List<SongItem> songItemList = new ArrayList<>();
-    int number;
+    private List<SongItem> songItemList = new ArrayList<>();
+    private int number;
     MusicService musicService;
+    private MusicBroadReceiver musicBroadReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,7 @@ public class MusicActivity extends AppCompatActivity {
         initSongFunction();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("UPDATE");
-        MusicBroadReceiver musicBroadReceiver = new MusicBroadReceiver();
+        musicBroadReceiver = new MusicBroadReceiver();
         registerReceiver(musicBroadReceiver, intentFilter);
     }
 
@@ -196,7 +197,6 @@ public class MusicActivity extends AppCompatActivity {
             //播放播放模式,1为列表播放，2为单曲循环，3为随机播放
             Bundle bundle = intent.getExtras();
             int playMode = bundle.getInt("playNumber");
-            Log.d("zwyhj",String.valueOf(playMode));
             if (playMode == 1) {
                 stopProgress();
                 number=MusicService.songNumber;
@@ -292,6 +292,7 @@ public class MusicActivity extends AppCompatActivity {
             mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    unregisterReceiver(musicBroadReceiver);
                     finish();
                 }
             });
@@ -303,5 +304,4 @@ public class MusicActivity extends AppCompatActivity {
 
         }
     };
-
 }

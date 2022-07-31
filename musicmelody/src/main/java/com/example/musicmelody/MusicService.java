@@ -406,6 +406,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        Log.d("playPattern",String.valueOf(playPattern));
         Intent intent = new Intent();
         intent.setAction("UPDATE");
         Bundle bundle = new Bundle();
