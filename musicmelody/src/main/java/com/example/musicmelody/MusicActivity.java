@@ -1,5 +1,6 @@
 package com.example.musicmelody;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -11,10 +12,11 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -27,7 +29,7 @@ import java.util.List;
 
 public class MusicActivity extends AppCompatActivity {
     private ImageView mSongImageView, mPlayImageView;
-    private TextView mTextView1, mTextView2;
+    private TextView mTextView1, mTextView2,mTextViewCurrent,mTextViewTotal;
     private Toolbar mToolbar;
     private SeekBar mSeekBar;
     private MusicService.MusicPlay musicPlay;
@@ -41,6 +43,7 @@ public class MusicActivity extends AppCompatActivity {
     private int number;
     MusicService musicService;
     private MusicBroadReceiver musicBroadReceiver;
+    private boolean isSetTotalTime=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,7 @@ public class MusicActivity extends AppCompatActivity {
             case 2:
                 mivPlayMode.setImageResource(R.drawable.ic_loop_playback);
                 break;
+
             case 3:
                 mivPlayMode.setImageResource(R.drawable.ic_random_play);
                 break;
@@ -91,7 +95,7 @@ public class MusicActivity extends AppCompatActivity {
                     //写音乐播放事件
                     mPlayImageView.setSelected(true);
                     play = true;
-                    HttpUtil.cachedThreadPool.execute(new Runnable() {
+                    Util.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
                             musicService.startMusic(songItemList.get(number));
@@ -119,7 +123,7 @@ public class MusicActivity extends AppCompatActivity {
                     number += 1;
                 }
                 updateView();
-                HttpUtil.cachedThreadPool.execute(new Runnable() {
+                Util.cachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
                         MusicService.isStartActivity = false;
@@ -143,7 +147,7 @@ public class MusicActivity extends AppCompatActivity {
                     number -= 1;
                 }
                 updateView();
-                HttpUtil.cachedThreadPool.execute(new Runnable() {
+                Util.cachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
                         MusicService.isStartActivity = false;
@@ -159,7 +163,7 @@ public class MusicActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //播放播放模式,1为列表播放，2为单循环，3为随机播放
-                int playInt =musicService.playMode();
+                int playInt = musicService.playMode();
                 switch (playInt) {
                     case 1:
                         mivPlayMode.setImageResource(R.drawable.ic_list_play);
@@ -189,6 +193,8 @@ public class MusicActivity extends AppCompatActivity {
         mivNextSong = findViewById(R.id.iv_next_song_service);
         mivPreSong = findViewById(R.id.iv_pre_song_service);
         mivPlayMode = findViewById(R.id.iv_play_mode_service);
+        mTextViewCurrent=findViewById(R.id.tv_service_current_time);
+        mTextViewTotal=findViewById(R.id.tv_service_total_time);
     }
 
     public class MusicBroadReceiver extends BroadcastReceiver {
@@ -199,10 +205,11 @@ public class MusicActivity extends AppCompatActivity {
             int playMode = bundle.getInt("playNumber");
             if (playMode == 1) {
                 stopProgress();
-                number=MusicService.songNumber;
+                number = MusicService.songNumber;
                 updateView();
                 mPlayImageView.setSelected(true);
                 play = true;
+                isSetTotalTime=true;
                 startProgress();
             } else if (playMode == 3) {
                 number = bundle.getInt("songNumber");
@@ -210,11 +217,12 @@ public class MusicActivity extends AppCompatActivity {
                 updateView();
                 mPlayImageView.setSelected(true);
                 play = true;
+                isSetTotalTime=true;
                 startProgress();
             }
-            String s=bundle.getString("PLAY");
-            if(s!=null){
-                switch (s){
+            String s = bundle.getString("PLAY");
+            if (s != null) {
+                switch (s) {
                     case "START_MUSIC":
                         mPlayImageView.setSelected(true);
                         play = true;
@@ -222,7 +230,7 @@ public class MusicActivity extends AppCompatActivity {
                         break;
                     case "PAUSE_MUSIC":
                         mPlayImageView.setSelected(false);
-                        play=false;
+                        play = false;
                         stopProgress();
                         break;
                     case "BROAD_RECEIVER_PRE":
@@ -235,6 +243,7 @@ public class MusicActivity extends AppCompatActivity {
                         mPlayImageView.setSelected(true);
                         play = true;
                         startProgress();
+                        isSetTotalTime=true;
                         break;
                     case "BROAD_RECEIVER_NEXT":
                         if (number == songItemList.size() - 1) {
@@ -246,6 +255,7 @@ public class MusicActivity extends AppCompatActivity {
                         mPlayImageView.setSelected(true);
                         play = true;
                         startProgress();
+                        isSetTotalTime=true;
                         break;
                 }
             }
@@ -260,6 +270,15 @@ public class MusicActivity extends AppCompatActivity {
         Picasso.with(this).load(songItemList.get(number).getPicUrl()).placeholder(R.drawable.ic_music_start).into(mSongImageView);
     }
 
+    private Handler handler=new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            mTextViewTotal.setText(Util.format(musicService.getMusicTotalTime()));
+            mTextViewCurrent.setText(Util.format(musicService.getMusicCurrentTime()));
+        }
+    };
+
     private final Runnable r = new Runnable() {
         @Override
         public void run() {
@@ -268,6 +287,8 @@ public class MusicActivity extends AppCompatActivity {
                     mSeekBar.setMax(musicService.getMusicTotalTime());
                     Thread.sleep(70);
                     mSeekBar.setProgress(musicService.getMusicCurrentTime());
+                    Message message =new Message();
+                    handler.sendMessage(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -277,7 +298,7 @@ public class MusicActivity extends AppCompatActivity {
 
     private void startProgress() {
         isTime = true;
-        HttpUtil.cachedThreadPool.execute(r);
+        Util.cachedThreadPool.execute(r);
     }
 
     private void stopProgress() {
@@ -288,7 +309,7 @@ public class MusicActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             musicPlay = (MusicService.MusicPlay) service;
-            musicService=musicPlay.getService();
+            musicService = musicPlay.getService();
             mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

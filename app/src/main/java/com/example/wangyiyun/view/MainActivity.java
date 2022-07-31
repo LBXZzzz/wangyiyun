@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //设置状态栏的背景颜色和字体颜色
+        getWindow().setStatusBarColor(Color.rgb(255, 255, 255));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         MusicService.songItemList = songList;
@@ -55,9 +58,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         Intent bindIntent = new Intent(this, MusicService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
-        //设置状态栏的背景颜色和字体颜色
-        getWindow().setStatusBarColor(Color.rgb(255, 255, 255));
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
         initPaper();
         initTabView();
         initSongFunction();

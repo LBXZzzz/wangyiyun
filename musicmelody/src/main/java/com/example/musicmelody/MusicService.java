@@ -31,7 +31,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -220,6 +219,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
             String musicId = songItem.getSongId();
             String url = "https://netease-cloud-music-api-gan.vercel.app/song/url?id=" + musicId;
             String songPlayId = "https://music.163.com/song/media/outer/url?id=" + musicId + ".mp3";
+            remoteViews.setImageViewResource(R.id.iv_notification_music_play_service, R.drawable.ic_music_start);
             remoteViews.setTextViewText(R.id.tv_notification_song_name, songItem.getSongName());
             remoteViews.setTextViewText(R.id.tv_notification_singer_name, songItem.getSingerName());
             handler = new Handler(Looper.getMainLooper()) {
@@ -289,9 +289,9 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     //获取歌曲id后拿来获取歌曲的url
     private void returnData(String url) {
-        HttpUtil.cachedThreadPool.execute(() -> {
+        Util.cachedThreadPool.execute(() -> {
             try {
-                analyzeData(HttpUtil.get(url));
+                analyzeData(Util.get(url));
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -356,7 +356,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         try {
             i = mediaPlayer.getDuration();
         } catch (Exception ignore) {
-
+            return 0;
         }
         return i;
     }
@@ -367,7 +367,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         try {
             i = mediaPlayer.getCurrentPosition();
         } catch (Exception ignore) {
-
+            return 0;
         }
         return i;
     }
