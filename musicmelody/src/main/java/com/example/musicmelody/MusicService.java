@@ -145,7 +145,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
     //记录随机播放的列的几首哥
     private int randomPlay = 0;
     //判断是否准备好了,0是准备好了，1是未准备好
-    private boolean isPreSee = false;
+    boolean isPreSee = false;
     //判断是否需要重新排列随机播放的列表
     boolean isRandom = true;
     //随机播放的列表
@@ -276,18 +276,14 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                         try {
                             mediaPlayer.prepareAsync();
                         } catch (IllegalStateException exception) {
-
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     isPlay = false;
-                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mp) {
-                            isPreSee = true;
-                            mediaPlayer.start();
-                        }
+                    mediaPlayer.setOnPreparedListener(mp -> {
+                        isPreSee = true;
+                        mediaPlayer.start();
                     });
                 }
             };
@@ -362,7 +358,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     @Override
     public int getMusicTotalTime() {
-        int i = 0;
+        int i;
         try {
             i = mediaPlayer.getDuration();
         } catch (Exception ignore) {
@@ -373,7 +369,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     @Override
     public int getMusicCurrentTime() {
-        int i = 0;
+        int i;
         try {
             i = mediaPlayer.getCurrentPosition();
         } catch (Exception ignore) {

@@ -34,7 +34,7 @@ public class MusicActivity extends AppCompatActivity {
     private SeekBar mSeekBar;
     private MusicService.MusicPlay musicPlay;
     private ImageView mivNextSong, mivPreSong, mivPlayMode;
-    private SongItem songItem;
+    SongItem songItem;
     private boolean isTime = false;
     //判断歌曲是否有在播放
     private boolean play = false;
@@ -43,7 +43,7 @@ public class MusicActivity extends AppCompatActivity {
     private int number;
     private MusicService musicService;
     private MusicBroadReceiver musicBroadReceiver;
-    private boolean isSetTotalTime = true;
+    boolean isSetTotalTime = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,103 +87,82 @@ public class MusicActivity extends AppCompatActivity {
 
     private void initSongFunction() {
         mPlayImageView.setSelected(true);
-        mPlayImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mPlayImageView.setOnClickListener(v -> {
+            MusicService.isStartActivity = false;
+            if (!play) {
+                //写音乐播放事件
+                mPlayImageView.setSelected(true);
+                play = true;
+                Intent intent = new Intent();
+                intent.setAction("PlayStart");
+                sendBroadcast(intent);
+                Util.cachedThreadPool.execute(() -> {
+                    musicService.startMusic(songItemList.get(number));
+                    startProgress();
+                });
+            } else {
+                //音乐暂停
+                mPlayImageView.setSelected(false);
+                play = false;
+                Intent intent = new Intent();
+                intent.setAction("PlayPause");
+                sendBroadcast(intent);
+                musicService.stopMusic();
+                stopProgress();
+            }
+        });
+        mivNextSong.setOnClickListener(v -> {
+            mivNextSong.setSelected(true);
+            mivNextSong.setSelected(false);
+            stopProgress();
+            if (number == songItemList.size() - 1) {
+                number = 0;
+            } else {
+                number += 1;
+            }
+            updateView();
+            Util.cachedThreadPool.execute(() -> {
                 MusicService.isStartActivity = false;
-                if (!play) {
-                    //写音乐播放事件
-                    mPlayImageView.setSelected(true);
-                    play = true;
-                    Intent intent = new Intent();
-                    intent.setAction("PlayStart");
-                    sendBroadcast(intent);
-                    Util.cachedThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            musicService.startMusic(songItemList.get(number));
-                            startProgress();
-                        }
-                    });
-                } else {
-                    //音乐暂停
-                    mPlayImageView.setSelected(false);
-                    play = false;
-                    Intent intent = new Intent();
-                    intent.setAction("PlayPause");
-                    sendBroadcast(intent);
-                    musicService.stopMusic();
-                    stopProgress();
-                }
-            }
+                musicService.nextSong();
+            });
+            mPlayImageView.setSelected(true);
+            play = true;
+            startProgress();
         });
-        mivNextSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mivNextSong.setSelected(true);
-                mivNextSong.setSelected(false);
-                stopProgress();
-                if (number == songItemList.size() - 1) {
-                    number = 0;
-                } else {
-                    number += 1;
-                }
-                updateView();
-                Util.cachedThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        MusicService.isStartActivity = false;
-                        musicService.nextSong();
-                    }
-                });
-                mPlayImageView.setSelected(true);
-                play = true;
-                startProgress();
+        mivPreSong.setOnClickListener(v -> {
+            mivPreSong.setSelected(true);
+            mivPreSong.setSelected(false);
+            stopProgress();
+            if (number == 0) {
+                number = songItemList.size() - 1;
+            } else {
+                number -= 1;
             }
+            updateView();
+            Util.cachedThreadPool.execute(() -> {
+                MusicService.isStartActivity = false;
+                musicService.preSong();
+            });
+            mPlayImageView.setSelected(true);
+            play = true;
+            startProgress();
         });
-        mivPreSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mivPreSong.setSelected(true);
-                mivPreSong.setSelected(false);
-                stopProgress();
-                if (number == 0) {
-                    number = songItemList.size() - 1;
-                } else {
-                    number -= 1;
-                }
-                updateView();
-                Util.cachedThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        MusicService.isStartActivity = false;
-                        musicService.preSong();
-                    }
-                });
-                mPlayImageView.setSelected(true);
-                play = true;
-                startProgress();
-            }
-        });
-        mivPlayMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //播放播放模式,1为列表播放，2为单循环，3为随机播放
-                int playInt = musicService.playMode();
-                switch (playInt) {
-                    case 1:
-                        mivPlayMode.setImageResource(R.drawable.ic_list_play);
-                        Toast.makeText(getApplicationContext(), "列表播放", Toast.LENGTH_SHORT).show();
-                        break;
-                    case 2:
-                        mivPlayMode.setImageResource(R.drawable.ic_loop_playback);
-                        Toast.makeText(getApplicationContext(), "单曲循环", Toast.LENGTH_SHORT).show();
-                        break;
-                    case 3:
-                        mivPlayMode.setImageResource(R.drawable.ic_random_play);
-                        Toast.makeText(getApplicationContext(), "随机播放", Toast.LENGTH_SHORT).show();
-                        break;
-                }
+        mivPlayMode.setOnClickListener(v -> {
+            //播放播放模式,1为列表播放，2为单循环，3为随机播放
+            int playInt = musicService.playMode();
+            switch (playInt) {
+                case 1:
+                    mivPlayMode.setImageResource(R.drawable.ic_list_play);
+                    Toast.makeText(getApplicationContext(), "列表播放", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    mivPlayMode.setImageResource(R.drawable.ic_loop_playback);
+                    Toast.makeText(getApplicationContext(), "单曲循环", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
+                    mivPlayMode.setImageResource(R.drawable.ic_random_play);
+                    Toast.makeText(getApplicationContext(), "随机播放", Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
     }
@@ -316,12 +295,9 @@ public class MusicActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             musicPlay = (MusicService.MusicPlay) service;
             musicService = musicPlay.getService();
-            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    stopProgress();
-                    finish();
-                }
+            mToolbar.setNavigationOnClickListener(view -> {
+                stopProgress();
+                finish();
             });
             startProgress();
         }

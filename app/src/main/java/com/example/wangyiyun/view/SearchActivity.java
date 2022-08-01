@@ -39,7 +39,7 @@ import com.example.wangyiyun.presenter.SearchPresenter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements ContactClass.IView, ContactClass.IView2, ContactClass.IView3 {
+public class SearchActivity extends AppCompatActivity implements ContactClass.IView, ContactClass.IView2{
     //布局控件
     private EditText mEditText;
     private Button mButton;
@@ -78,7 +78,7 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
         }
         Intent bindIntent = new Intent(this, MusicService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
-        searchPresenter = new SearchPresenter(this, this, this);
+        searchPresenter = new SearchPresenter(this, this);
         initControl();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -217,15 +217,4 @@ public class SearchActivity extends AppCompatActivity implements ContactClass.IV
 
         }
     };
-
-    @Override
-    public void getData(String dataString, String dataString2) {
-        String songPlayId;
-        if (dataString.equals("null")) {
-            songPlayId = dataString2;
-        } else {
-            songPlayId = dataString;
-            Toast.makeText(SearchActivity.this, "VIP歌曲，试听30秒", Toast.LENGTH_SHORT).show();
-        }
-    }
 }
