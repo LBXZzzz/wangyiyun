@@ -73,24 +73,24 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:text="当前时间" />
+
             <TextView
                 android:id="@+id/tv_service_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:text="当前时间"
                 android:layout_toRightOf="@+id/tv_service"
-                android:textColor="@color/big_red"
-                />
+                android:text="当前时间"
+                android:textColor="@color/big_red" />
+
             <TextView
                 android:id="@+id/tv_service_total_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
-                android:text="当前时间"
                 android:layout_toLeftOf="@+id/tv2_service"
-                android:textColor="@color/big_red"
-                />
+                android:text="当前时间"
+                android:textColor="@color/big_red" />
 
             <TextView
                 android:id="@+id/tv2_service"

@@ -68,6 +68,8 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         intentFilter.addAction(BROAD_RECEIVER_ACTION_PAUSE);
         intentFilter.addAction(BROAD_RECEIVER_NEXT);
         intentFilter.addAction(BROAD_RECEIVER_PRE);
+        intentFilter.addAction("PlayPause");
+        intentFilter.addAction("PlayStart");
         BroadReceiver broadReceiver = new BroadReceiver();
         registerReceiver(broadReceiver, intentFilter);
         Intent intent1 = new Intent();
@@ -204,6 +206,14 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
                     intent3.putExtras(bundle1);
                     sendBroadcast(intent3);
                     stopMusic();
+                    break;
+                case "PlayStart":
+                    remoteViews.setImageViewResource(R.id.iv_notification_music_play_service, R.drawable.ic_music_start);
+                    notificationManager.notify(1, notification);
+                    break;
+                case "PlayPause":
+                    remoteViews.setImageViewResource(R.id.iv_notification_music_play_service, R.drawable.ic_music_stop);
+                    notificationManager.notify(1, notification);
                     break;
             }
         }
@@ -406,7 +416,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d("playPattern",String.valueOf(playPattern));
+        Log.d("playPattern", String.valueOf(playPattern));
         Intent intent = new Intent();
         intent.setAction("UPDATE");
         Bundle bundle = new Bundle();

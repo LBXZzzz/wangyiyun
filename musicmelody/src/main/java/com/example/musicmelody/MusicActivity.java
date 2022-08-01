@@ -29,7 +29,7 @@ import java.util.List;
 
 public class MusicActivity extends AppCompatActivity {
     private ImageView mSongImageView, mPlayImageView;
-    private TextView mTextView1, mTextView2,mTextViewCurrent,mTextViewTotal;
+    private TextView mTextView1, mTextView2, mTextViewCurrent, mTextViewTotal;
     private Toolbar mToolbar;
     private SeekBar mSeekBar;
     private MusicService.MusicPlay musicPlay;
@@ -41,9 +41,9 @@ public class MusicActivity extends AppCompatActivity {
     //
     private List<SongItem> songItemList = new ArrayList<>();
     private int number;
-    MusicService musicService;
+    private MusicService musicService;
     private MusicBroadReceiver musicBroadReceiver;
-    private boolean isSetTotalTime=true;
+    private boolean isSetTotalTime = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,11 +90,14 @@ public class MusicActivity extends AppCompatActivity {
         mPlayImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                musicService.playMode();
+                MusicService.isStartActivity = false;
                 if (!play) {
                     //写音乐播放事件
                     mPlayImageView.setSelected(true);
                     play = true;
+                    Intent intent = new Intent();
+                    intent.setAction("PlayStart");
+                    sendBroadcast(intent);
                     Util.cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -106,6 +109,9 @@ public class MusicActivity extends AppCompatActivity {
                     //音乐暂停
                     mPlayImageView.setSelected(false);
                     play = false;
+                    Intent intent = new Intent();
+                    intent.setAction("PlayPause");
+                    sendBroadcast(intent);
                     musicService.stopMusic();
                     stopProgress();
                 }
@@ -193,8 +199,8 @@ public class MusicActivity extends AppCompatActivity {
         mivNextSong = findViewById(R.id.iv_next_song_service);
         mivPreSong = findViewById(R.id.iv_pre_song_service);
         mivPlayMode = findViewById(R.id.iv_play_mode_service);
-        mTextViewCurrent=findViewById(R.id.tv_service_current_time);
-        mTextViewTotal=findViewById(R.id.tv_service_total_time);
+        mTextViewCurrent = findViewById(R.id.tv_service_current_time);
+        mTextViewTotal = findViewById(R.id.tv_service_total_time);
     }
 
     public class MusicBroadReceiver extends BroadcastReceiver {
@@ -209,7 +215,7 @@ public class MusicActivity extends AppCompatActivity {
                 updateView();
                 mPlayImageView.setSelected(true);
                 play = true;
-                isSetTotalTime=true;
+                isSetTotalTime = true;
                 startProgress();
             } else if (playMode == 3) {
                 number = bundle.getInt("songNumber");
@@ -217,7 +223,7 @@ public class MusicActivity extends AppCompatActivity {
                 updateView();
                 mPlayImageView.setSelected(true);
                 play = true;
-                isSetTotalTime=true;
+                isSetTotalTime = true;
                 startProgress();
             }
             String s = bundle.getString("PLAY");
@@ -243,7 +249,7 @@ public class MusicActivity extends AppCompatActivity {
                         mPlayImageView.setSelected(true);
                         play = true;
                         startProgress();
-                        isSetTotalTime=true;
+                        isSetTotalTime = true;
                         break;
                     case "BROAD_RECEIVER_NEXT":
                         if (number == songItemList.size() - 1) {
@@ -255,14 +261,14 @@ public class MusicActivity extends AppCompatActivity {
                         mPlayImageView.setSelected(true);
                         play = true;
                         startProgress();
-                        isSetTotalTime=true;
+                        isSetTotalTime = true;
                         break;
                 }
             }
         }
     }
 
-    public void updateView() {
+    private void updateView() {
         //加载歌曲的名字和歌手名字
         mTextView1.setText(songItemList.get(number).getSongName() + "-");
         mTextView2.setText(songItemList.get(number).getSingerName());
@@ -270,7 +276,7 @@ public class MusicActivity extends AppCompatActivity {
         Picasso.with(this).load(songItemList.get(number).getPicUrl()).placeholder(R.drawable.ic_music_start).into(mSongImageView);
     }
 
-    private Handler handler=new Handler(Looper.getMainLooper()){
+    private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -287,7 +293,7 @@ public class MusicActivity extends AppCompatActivity {
                     mSeekBar.setMax(musicService.getMusicTotalTime());
                     Thread.sleep(70);
                     mSeekBar.setProgress(musicService.getMusicCurrentTime());
-                    Message message =new Message();
+                    Message message = new Message();
                     handler.sendMessage(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -313,7 +319,7 @@ public class MusicActivity extends AppCompatActivity {
             mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    unregisterReceiver(musicBroadReceiver);
+                    stopProgress();
                     finish();
                 }
             });
@@ -325,4 +331,11 @@ public class MusicActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(musicBroadReceiver);
+        stopProgress();
+    }
 }
