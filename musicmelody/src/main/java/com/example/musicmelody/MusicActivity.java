@@ -1,5 +1,6 @@
 package com.example.musicmelody;
 
+import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -37,7 +39,7 @@ public class MusicActivity extends AppCompatActivity {
     SongItem songItem;
     private boolean isTime = false;
     //判断歌曲是否有在播放
-    private boolean play = false;
+    private boolean play = true;
     //
     private List<SongItem> songItemList = new ArrayList<>();
     private int number;
@@ -296,7 +298,6 @@ public class MusicActivity extends AppCompatActivity {
             musicPlay = (MusicService.MusicPlay) service;
             musicService = musicPlay.getService();
             mToolbar.setNavigationOnClickListener(view -> {
-                stopProgress();
                 finish();
             });
             startProgress();

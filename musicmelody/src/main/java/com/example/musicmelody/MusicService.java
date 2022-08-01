@@ -73,7 +73,7 @@ public class MusicService extends Service implements IMusic, MediaPlayer.OnCompl
         BroadReceiver broadReceiver = new BroadReceiver();
         registerReceiver(broadReceiver, intentFilter);
         Intent intent1 = new Intent();
-        intent1.setAction(BROAD_RECEIVER_ACTION_PLAY);
+        intent1.setAction(BROAD_RECEIVER_ACTION_PAUSE);
         PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent1, PendingIntent.FLAG_MUTABLE);
         remoteViews.setOnClickPendingIntent(R.id.iv_notification_music_play_service, pending);
         intent1.setAction(BROAD_RECEIVER_NEXT);
